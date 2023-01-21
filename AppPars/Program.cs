@@ -25,7 +25,7 @@ namespace AppPars
         static void Main(string[] args)
         {
             System.Windows.Application app = new System.Windows.Application();
-            app.Startup += async (s, e) => await AppStartupAsync(args);
+            app.Startup += async (_, _) => await AppStartupAsync(args);
             app.Run();
         }
 

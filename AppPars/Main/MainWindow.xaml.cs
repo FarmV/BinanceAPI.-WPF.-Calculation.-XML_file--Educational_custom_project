@@ -1,35 +1,18 @@
-﻿
-
-using ControlzEx.Standard;
-
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 
 using Microsoft.VisualBasic;
 
 using ReactiveUI;
 
-using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.TextFormatting;
-using System.Windows.Resources;
-using System.Windows.Shapes;
+using System.Windows.Media.Animation;
 
 
 
@@ -62,11 +45,9 @@ namespace AppPars
             ViewModel = viewModel;
             this.Data.DataContext = viewModel;
 
-            this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
-            this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
 
 
-         
+
 
         }
 
@@ -101,17 +82,7 @@ namespace AppPars
                 if (e.ButtonState is not MouseButtonState.Pressed) return;
                 else { this.DragMove(); e.Handled = true; }
             };
-            HamburgerMenu.MouseDown += (_, e) =>
-            {
-                if (e.ButtonState is not MouseButtonState.Pressed) return;
-                if (HamburgerMenu.IsPaneOpen is true) return;
-                else { this.DragMove(); }
-            };
-
-           
-
-            
-
+          
         }
 
 
@@ -151,32 +122,19 @@ namespace AppPars
             e.Handled = true;
         }
 
-        private void HamburgerMenu_HamburgerButtonClick(object sender, RoutedEventArgs e)
-        {
 
-            //if (HeaderColumn.Margin != new Thickness(0))
-            //{
-            //    HeaderColumn.Margin = default;
-            //    return;
-            //}
-            //else
-            //{
-            //    HeaderColumn.Margin = new Thickness(-150, 0, 0, 0);
-            //    return;
-            //}
-        }
 
         private void NumericUpDownO1_ToolTipOpening(object sender, ToolTipEventArgs e)
         {
             var res = ((MahApps.Metro.Controls.NumericUpDown)e.OriginalSource).ToolTip;
             if (res is double result)
             {
-                CultureInfo culture = new CultureInfo("ru-RU");               
+                CultureInfo culture = new CultureInfo("ru-RU");
                 culture.NumberFormat.NumberGroupSeparator = " ";
 
                 var test = result.ToString("N2", culture);
 
-                ((MahApps.Metro.Controls.NumericUpDown)e.OriginalSource).ToolTip = result.ToString(test) ;
+                ((MahApps.Metro.Controls.NumericUpDown)e.OriginalSource).ToolTip = result.ToString(test);
             }
 
 
@@ -196,25 +154,84 @@ namespace AppPars
             _currentCell = cell;
         }
 
-       
-    }
-    public class ConverterStringValuse : IValueConverter
-        {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-            if (value is null || Information.IsNumeric(value) is false ) return null;
 
-                         
-                CultureInfo newCulture = new CultureInfo("ru-RU");
-                newCulture.NumberFormat.NumberGroupSeparator = " ";
-                return ((double)value).ToString("N2",  newCulture);
+        private void MainWindowObject_StateChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == WindowState.Maximized)
+            {
+
+                Storyboard storyboard = new Storyboard();
+
+
+                DoubleAnimation animation = new DoubleAnimation();
+                animation.From = 0.25;
+                animation.To = 0.62;
+                animation.Duration = new Duration(TimeSpan.FromMilliseconds(280));
+
+                Storyboard.SetTargetProperty(animation, new PropertyPath("Opacity"));
+                storyboard.Children.Add(animation);
+
+
+                storyboard.Begin(this.ViewboxBackgroundObject);
+
+                return;
             }
 
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            if (this.WindowState == WindowState.Normal)
             {
-                throw new NotImplementedException();
+
+                Storyboard storyboard = new Storyboard();
+                DoubleAnimation animation = new DoubleAnimation();
+                animation.From = 0.62;
+
+                animation.To = 0.25;
+                animation.Duration = new Duration(TimeSpan.FromMilliseconds(280));
+
+                Storyboard.SetTargetProperty(animation, new PropertyPath("Opacity"));
+                storyboard.Children.Add(animation);
+
+                storyboard.Begin(this.ViewboxBackgroundObject);
+
+                return;
+
+
             }
         }
+
+    }
+    public class ConverterStringValuse : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is null || Information.IsNumeric(value) is false) return null;
+
+
+            CultureInfo newCulture = new CultureInfo("ru-RU");
+            newCulture.NumberFormat.NumberGroupSeparator = " ";
+            return ((double)value).ToString("N2", newCulture);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class InverseVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((Visibility)value == Visibility.Visible)
+                return Visibility.Collapsed;
+            else
+                return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Convert(value, targetType, parameter, culture);
+        }
+    }
 
 }
 
