@@ -7,12 +7,14 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace AppPars
@@ -120,6 +122,12 @@ namespace AppPars
             SetNewDirectoryCommand = ReactiveCommand.Create(DataManagement.SetNewDirectory);
             OpenDirectoryCommand = ReactiveCommand.CreateFromTask(() =>
             {
+                if(Directory.Exists(_dataManagement.SavePath) is not true)
+                {
+                    System.Windows.MessageBox.Show($"Вероятно отсутствует директория{Environment.NewLine}{_dataManagement.SavePath}{Environment.NewLine}Проверте наличие директории", "Ошибка",
+                       System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return Task.CompletedTask;
+                }
                 string argument = "/n, \"" + $"{_dataManagement.SavePath}" + "\"";
                 System.Diagnostics.Process.Start("explorer.exe", argument);
                 return Task.CompletedTask;
