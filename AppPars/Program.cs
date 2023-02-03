@@ -32,8 +32,8 @@ namespace AppPars
         private static async Task AppStartupAsync(string[] args) 
         {
             StartAppDesigner = false ;
-            DataManagement dataManagement = await DataManagement.Create().ConfigureAwait(false);
-            await OP.CreateMainWindow(new MainWindowViewModel(dataManagement)).ConfigureAwait(false);
+          // DataManagement dataManagement = await DataManagement.Create().ConfigureAwait(false);
+            await OP.CreateMainWindow(new MainWindowViewModel(DataManagement.Create())).ConfigureAwait(false);
 
             using IHost host = Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((hostingContext, configuration) =>
             { configuration.Sources.Clear(); }).ConfigureServices((hostContext, container) =>
