@@ -4,15 +4,15 @@ namespace AppPars
 {
     public partial class DataManagement 
     {
-        public class DataVolume: ReactiveUI.ReactiveObject
+        public class DataVolumeTmp: ReactiveUI.ReactiveObject
         {
             private decimal _volume;
             private decimal _quantity;
             private decimal _result;
-            public DataVolume(decimal volume, decimal quantity, decimal result)
+            public DataVolumeTmp(decimal volume, decimal quantity, decimal result)
             {
                 Volume = volume;
-                Quantity = quantity;
+                QuantityPrice = quantity;
                 Result = result;
             }
 
@@ -21,7 +21,7 @@ namespace AppPars
                 get => _volume;
                 set => this.RaiseAndSetIfChanged(ref _volume, value);
             }
-            public decimal Quantity 
+            public decimal QuantityPrice
             { 
                 get => _quantity;
                 set => this.RaiseAndSetIfChanged(ref _quantity, value);

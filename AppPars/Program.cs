@@ -25,15 +25,15 @@ namespace AppPars
         static void Main(string[] args)
         {
             System.Windows.Application app = new System.Windows.Application();
-            app.Startup += async (s, e) => await AppStartupAsync(args);
+            app.Startup += async (_, _) => await AppStartupAsync(args);
             app.Run();
         }
 
         private static async Task AppStartupAsync(string[] args) 
         {
             StartAppDesigner = false ;
-            DataManagement dataManagement = await DataManagement.Create().ConfigureAwait(false);
-            await OP.CreateMainWindow(new MainWindowViewModel(dataManagement)).ConfigureAwait(false);
+          // DataManagement dataManagement = await DataManagement.Create().ConfigureAwait(false);
+            await OP.CreateMainWindow(new MainWindowViewModel(DataManagement.Create())).ConfigureAwait(false);
 
             using IHost host = Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((hostingContext, configuration) =>
             { configuration.Sources.Clear(); }).ConfigureServices((hostContext, container) =>

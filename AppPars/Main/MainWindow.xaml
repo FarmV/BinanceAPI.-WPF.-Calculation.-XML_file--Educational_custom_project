@@ -7,22 +7,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:sys="clr-namespace:System.Windows;assembly=WindowsBase"
+        
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"                
         xmlns:local="clr-namespace:AppPars"
-        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" 
+        xmlns:converters="http://metro.mahapps.com/winfx/xaml/shared"
+    
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+    
+    
         Title="MainWindow" 
-        Height="600" 
-        Width="794"
+        Height="500" 
+        Width="497"
         MinWidth="170"
                            
         WindowStartupLocation="CenterScreen"         
         WindowTransitionsEnabled ="True"
         ShowTitleBar="False"
         ShowInTaskbar="True"
+        ShowMinButton="True"        
+        IsMaxRestoreButtonEnabled="True"
+        ShowCloseButton="True"
         ShowDialogsOverTitleBar="False"
         ShowIconOnTitleBar="False"
-        IsMaxRestoreButtonEnabled="True"
-        ShowMinButton="True"        
         ResizeMode ="CanResizeWithGrip"   
         BorderThickness="1"      
         Topmost="False"
@@ -34,9 +42,13 @@
         TryToBeFlickerFree="True"
         WindowTitleBrush="Transparent"
         NonActiveBorderBrush="Transparent" 
-       
-         
-         
+
+        x:Name="MainWindowObject"
+    
+    
+        StateChanged="MainWindowObject_StateChanged"
+     
+        MouseMove="MainWindowObject_MouseMove"
         >
 
 
@@ -56,6 +68,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Color x:Key="BackColor" A="180" R="4" G="4" B="1"/>
             <SolidColorBrush x:Key="BackBrush">
                 <SolidColorBrush.Color>
                     <Color A="180" R="4" G="4" B="1"/>
@@ -74,372 +87,828 @@
 
             </Style>
 
-            <local:ConverterStringValuse x:Key="NumberConvetorSpace"/>
 
+
+            <local:MyCulture x:Key="Culture"/>
+            <local:ConverterStringValue x:Key="NumberConvetorSpace"/>
+            <local:InverseVisibilityConverter x:Key="InverseVisibilityConverter"/>
         </ResourceDictionary>
 
     </Window.Resources>
 
 
-    <Grid 
-        Visibility="Visible"
-        >
 
-        <Grid.RowDefinitions>
 
-            <RowDefinition 
-                Height="30"
-            />
+    <Grid>
 
-            <RowDefinition/>
-
-            <RowDefinition/>
-
-            <RowDefinition 
-                Height="30"
-            />
-
-        </Grid.RowDefinitions>
-
-        <Grid.ColumnDefinitions>
-
-            <ColumnDefinition
-                x:Name="OneColumn"
-                Width="auto"
-            />
-
-            <ColumnDefinition
-                Width="auto"
-            />
-
-            <ColumnDefinition 
-                Width="*"
-            />
-
-            <ColumnDefinition 
-                Width="30"
-            />
-
-        </Grid.ColumnDefinitions>
-
-        <Canvas 
-            x:Name="HeaderColumn" 
-            Panel.ZIndex="1000" 
-            Margin="0 0 0 0" 
-            Grid.Column="2" 
-            Background="Transparent" 
-            
-            
-        />
-
-        <Canvas 
-            x:Name="BottomColumn"
-            Panel.ZIndex="1000" 
-            Grid.Column="2"
-            Grid.Row="3" 
-            Background="Transparent" 
-        />
-
-        <Viewbox 
+        <Viewbox
+            Panel.ZIndex="-10000"
+            x:Name="ViewboxPlug"
             Grid.Column="0" 
             Grid.Row="0" 
             Grid.RowSpan="4" 
             Grid.ColumnSpan="4"
-            Stretch="UniformToFill" 
+            Stretch="None"
+            Opacity="0.25"
+            d:Opacity="1"
             >
 
-            <Image 
-                d:Opacity="1" 
-                Opacity="0.25"
-                >
+            <Viewbox.Style>
 
-                <Image.Source>
-
-                    <BitmapImage 
-                        UriSource="Background.png" 
-                        />
-
-                </Image.Source>
-            </Image>
-
-        </Viewbox>
-
-
-        <mah:HamburgerMenu 
-            x:Name="HamburgerMenu"
-            Grid.Row="0"
-            Grid.Column="0"
-            Grid.RowSpan="3"
-            Panel.ZIndex="1"
-            HorizontalAlignment="Left"  
-                   
-            DisplayMode ="CompactInline"
-            PaneBackground="Transparent"
-            OpenPaneLength="{Binding ElementName=OneColumn,Path=ActualWidth}"
-            MinimumOpenPaneLength="250"
-            CompactPaneLength="30"
-            HamburgerHeight="30"
-            HamburgerWidth="30"           
-            HamburgerButtonClick="HamburgerMenu_HamburgerButtonClick"
-            d:IsPaneOpen="true"
-            CanResizeOpenPane="True"
-            >
-
-            <mah:HamburgerMenu.Style>
-
-                <Style 
-                    TargetType="{x:Type mah:HamburgerMenu}" 
-                    BasedOn="{StaticResource MahApps.Styles.HamburgerMenu}"                   
+                <Style         
+                    TargetType="Viewbox"
                     >
-
                     <Style.Triggers>
 
-                        <Trigger 
-                            Property="IsPaneOpen" 
-                            Value="True"
-                            >
-
-                            <Setter 
-                                Property="CanResizeOpenPane"  
-                                Value="True"
-                            />
+                        <DataTrigger  
+                            Binding="{Binding ElementName=MainWindowObject, Path=WindowState}"
+                            Value="{x:Static WindowState.Maximized}">
 
 
-                            <Setter 
-                                Property="OpenPaneLength"  
-                                Value="300"
-                            />
-
-                        </Trigger>
-
-
-
-                        <Trigger 
-                            Property="IsPaneOpen" 
-                            Value="False"
-                            >
-
-                            <Setter 
-                                Property="CanResizeOpenPane" 
-                                Value="False"
-                            />
-
-                        </Trigger>
-
-                    </Style.Triggers>
-
-                </Style>
-
-            </mah:HamburgerMenu.Style>
-
-        </mah:HamburgerMenu>
-
-        <Grid            
-            Panel.ZIndex="1000"
-            Grid.Row="1"
-            Grid.RowSpan="2"
-            >
-
-            <Grid.Style>
-
-                <Style 
-                    TargetType="Grid"
-                    >
-
-                    <Style.Triggers>
-
-                        <DataTrigger 
-                             Binding="{Binding ElementName=HamburgerMenu, Path=IsPaneOpen}" 
-                             Value="false"
-                             >
-
-                            <Setter 
-                                Property="Visibility"
-                                Value="Collapsed" 
-                            />
-
+                            <!--<Setter Property="Viewbox.Opacity" Value="0.0"/> не работает?-->
+                            <!--<Setter Property="Cursor" Value="Help"/>-->
                         </DataTrigger>
 
                     </Style.Triggers>
 
+
                 </Style>
 
-            </Grid.Style>
 
-            <Grid
-                TextBlock.FontSize="13"
+            </Viewbox.Style>
+            <Grid>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <iconPacks:PackIconOcticons 
+                    Grid.RowSpan="2"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Foreground="White"
+                    Height="200"
+                    Width="200"
+                    Kind="CloudDownload" />
+                
+                <TextBlock 
+                    Grid.Row="2" 
+                    Text="Загрузка"
+                    FontSize="30"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center"
+                    Foreground="White">
+                </TextBlock>
+                <!--<Image               
                 >
 
-                <Grid.ColumnDefinitions>
 
-                    <ColumnDefinition
-                        Width="auto"
-                        
+
+                    <Image.Source>
+
+                        <BitmapImage 
+                        UriSource="Background.png" 
                     />
+
+                    </Image.Source>
+                </Image>-->
+
+            </Grid>
+        </Viewbox>
+
+        <Grid
+        x:Name="GlobalWorkGrid"
+        Grid.IsSharedSizeScope="True"
+        Panel.ZIndex="1" 
+        Visibility="Hidden"
+        >
+
+            <Grid.RowDefinitions>
+
+                <RowDefinition 
+                Height="30"
+            >
+                    <RowDefinition.Style>
+                        <Style TargetType="RowDefinition">
+
+                            <Style.Triggers>
+
+                                <DataTrigger Binding="{Binding ElementName=WorkPanelGrid, Path=Visibility}" 
+                                     Value="{x:Static Visibility.Collapsed}" >
+                                    <Setter Property="Height" Value="30"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+
+
+                        </Style>
+                    </RowDefinition.Style>
+
+                </RowDefinition>
+
+                <RowDefinition/>
+
+                <RowDefinition/>
+
+                <RowDefinition 
+                Height="30"
+            />
+
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition
+                x:Name="OneColumn"
+                MinWidth="500"
+                Width="Auto"
+                >
+
+                    <!--<ColumnDefinition.Style>
+
+                    <Style TargetType="ColumnDefinition">
+
+                        <Style.Triggers>
+
+
+
+                            <DataTrigger 
+                                Binding="{Binding ElementName=WorkPanelGrid, Path=Visibility}" 
+                                Value="{x:Static Visibility.Visible}"
+                                >
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames                                            
+                                                Storyboard.TargetProperty="(ColumnDefinition.Width)"                                              
+                                                >
+                                                <DiscreteObjectKeyFrame 
+                                                    KeyTime="0"
+                                                >
+                                                    <DiscreteObjectKeyFrame.Value>
+
+                                                        <GridLength>30.0</GridLength>
+
+                                                    </DiscreteObjectKeyFrame.Value>
+
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+
+                                            <ObjectAnimationUsingKeyFrames                                            
+                                                Storyboard.TargetProperty="(ColumnDefinition.MinWidth)"                                              
+                                                >
+                                                <DiscreteObjectKeyFrame 
+                                                    KeyTime="0"
+                                                >
+                                                    <DiscreteObjectKeyFrame.Value>
+
+                                                        <system:Double>30</system:Double>
+
+                                                    </DiscreteObjectKeyFrame.Value>
+
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames                                                
+                                                Storyboard.TargetProperty="(ColumnDefinition.Width)"                                                
+                                                >
+                                                <DiscreteObjectKeyFrame 
+                                                    KeyTime="0:0:0"                                                  
+                                                >
+                                                    <DiscreteObjectKeyFrame.Value>
+
+                                                        <GridLength>
+                                                            0.65*
+                                                        </GridLength>
+
+                                                    </DiscreteObjectKeyFrame.Value>
+
+                                                </DiscreteObjectKeyFrame>
+
+                                            </ObjectAnimationUsingKeyFrames>
+
+                                            <ObjectAnimationUsingKeyFrames                                            
+                                                Storyboard.TargetProperty="(ColumnDefinition.MinWidth)"                                              
+                                                >
+                                                <DiscreteObjectKeyFrame 
+                                                    KeyTime="0"
+                                                >
+                                                    <DiscreteObjectKeyFrame.Value>
+
+                                                        <system:Double>290</system:Double>
+
+                                                    </DiscreteObjectKeyFrame.Value>
+
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+
+                                        </Storyboard>
+
+                                    </BeginStoryboard>
+
+                                </DataTrigger.EnterActions>
+
+                            </DataTrigger>
+
+
+                        </Style.Triggers>
+
+                    </Style>
+                </ColumnDefinition.Style>-->
+
+                </ColumnDefinition>
+
+
+
+                <ColumnDefinition
+                
+            />
+
+                <ColumnDefinition 
+                Width="30"
+            />
+
+            </Grid.ColumnDefinitions>
+
+            <Border
+            x:Name="BorderOneClumn"
+            Margin="0 0 -1 0"
+            Panel.ZIndex="1"
+            Grid.Row ="1"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            BorderBrush="Transparent"
+         
+            >
+                <Border.BorderThickness>
+                    0 0 2 0
+                </Border.BorderThickness>
+
+
+
+            </Border>
+
+
+            <Canvas 
+            x:Name="HeaderColumn" 
+            Panel.ZIndex="1000" 
+            Margin="0 0 0 0" 
+            Grid.Column="1"
+            
+            Background="Transparent" 
+            
+            
+        />
+
+            <Canvas 
+            x:Name="BottomColumn"
+            Panel.ZIndex="1" 
+            Grid.Column="0"
+            Grid.Row="3"
+
+            Background="Transparent" 
+        />
+
+            <Viewbox
+            Panel.ZIndex="-10000"
+            x:Name="ViewboxBackgroundObject"
+            Grid.Column="0" 
+            Grid.Row="0" 
+            Grid.RowSpan="4" 
+            Grid.ColumnSpan="4"
+            Stretch="UniformToFill"
+            Opacity="0.25"
+            d:Opacity="1"
+            >
+
+                <Viewbox.Style>
+
+                    <Style         
+                    TargetType="Viewbox"
+                    >
+                        <Style.Triggers>
+
+                            <DataTrigger  
+                            Binding="{Binding ElementName=MainWindowObject, Path=WindowState}"
+                            Value="{x:Static WindowState.Maximized}">
+
+
+                                <!--<Setter Property="Viewbox.Opacity" Value="0.0"/> не работает?-->
+                                <!--<Setter Property="Cursor" Value="Help"/>-->
+                            </DataTrigger>
+
+                        </Style.Triggers>
+
+
+                    </Style>
+
+
+                </Viewbox.Style>
+
+                <Image               
+                >
+
+
+
+                    <Image.Source>
+
+                        <BitmapImage 
+                        UriSource="Background.png" 
+                    />
+
+                    </Image.Source>
+                </Image>
+
+            </Viewbox>
+
+
+            <Grid 
+            Grid.Column="0"
+            Grid.Row="0"
+            >
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*">
+
+                        <ColumnDefinition.Style>
+                            <Style 
+                            TargetType="ColumnDefinition"
+                            >
+                                <Style.Triggers>
+
+                                    <DataTrigger Binding="{Binding ElementName=WorkPanelGrid, Path=Visibility}" 
+                                     Value="{x:Static Visibility.Collapsed}" >
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="Width" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+
+
+                            </Style>
+                        </ColumnDefinition.Style>
+                    </ColumnDefinition>
 
                 </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
+                <Button
+            Grid.Column="0"
+            x:Name="TestB"
+           
+            BorderThickness="0"
+            Foreground="WhiteSmoke"
+            Click="TestB_Click"
+            >
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                    <Button.Style>
+                        <Style 
+                    BasedOn="{mah:StaticResource MahApps.Styles.Button.Hamburger}"
+                    TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=WorkPanelGrid, Path=Visibility}" 
+                                     Value="{x:Static Visibility.Visible}" >
+                                    <Setter Property="Button.HorizontalAlignment" Value="{x:Static HorizontalAlignment.Left}"/>
+                                    <Setter Property="Height" Value="30"/>
+                                    <Setter Property="Width" Value="30" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                    <iconPacks:PackIconVaadinIcons 
+                
+                Kind="Menu" />
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                    <Button.Triggers>
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation 
+                                Storyboard.TargetProperty="Background.Color"
+                                
+                                From="Transparent"
+                                Duration="0:0:0.2"
+                                >
+                                        <ColorAnimation.To>
+                                            <Color A="200" R="96" G="84" B="175"/>
+                                        </ColorAnimation.To>
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                                    </ColorAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.Click">
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                            <BeginStoryboard>
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                                <Storyboard>
+                                    <ObjectAnimationUsingKeyFrames 
+                                        Storyboard.TargetName="WorkPanelGrid"
+                                        Storyboard.TargetProperty="Visibility"
+                                
+                                        >
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                                        <DiscreteObjectKeyFrame 
+                                    KeyTime="0:0:0.0" 
+                                    Value="{Binding ElementName = WorkPanelGrid, 
+                                    Path = Visibility,
+                                    Converter= {StaticResource InverseVisibilityConverter}}"
+                                   
+                                    
+                                />
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
+                                    </ObjectAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
 
-                    <RowDefinition 
-                        Height="auto"
-                    />
 
-                </Grid.RowDefinitions>
+                </Button>
+
+
+                <Canvas 
+                Background="Transparent" 
+                Panel.ZIndex="1000" 
+                Grid.Column="1" 
+                x:Name="CanvasTopWorkPanel"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                >
+
+                    <Canvas.Style>
+                        <Style 
+                        TargetType="Canvas"
+                        >
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=WorkPanelGrid, Path=Visibility}" 
+                                     Value="{x:Static Visibility.Collapsed}" >
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+
+                                </DataTrigger>
+                            </Style.Triggers>
+
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </Style>
+                    </Canvas.Style>
+
+                </Canvas>
+
+            </Grid>
+
+            <GridSplitter
+                Panel.ZIndex="1000"
+                Grid.Column="0"
+                Grid.RowSpan="2"
+                Grid.Row ="1"
+                ShowsPreview="False"
+                Width="15"
+                Background="Transparent"
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                
+                Opacity="0"
+                Margin="0 0 -7 0"
+                
+        >
+
+                <GridSplitter.Triggers>
+
+                    <EventTrigger RoutedEvent="MouseEnter">
+                        <BeginStoryboard>
+                            <Storyboard>
+
+                                <ColorAnimation
+                                        Storyboard.TargetName="BorderOneClumn"
+
+                                        Storyboard.TargetProperty="BorderBrush.Color"
+                                        Duration="0:0:0:0"
+                                        >
+                                    <ColorAnimation.To>
+                                        <Color A="160" R="96" G="84" B="175"/>
+                                    </ColorAnimation.To>
+
+                                </ColorAnimation>
+
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+
+                    <EventTrigger RoutedEvent="MouseLeave">
+                        <BeginStoryboard>
+                            <Storyboard>
+
+
+                                <ObjectAnimationUsingKeyFrames 
+                                        Storyboard.TargetName="BorderOneClumn"
+                                        Storyboard.TargetProperty="BorderBrush.Color">
+                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <Color>
+                                                transparent
+                                            </Color>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+                                </ObjectAnimationUsingKeyFrames>
+
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+
+                </GridSplitter.Triggers>
+
+
+                <GridSplitter.Style>
+
+                    <Style 
+                    BasedOn="{mah:StaticResource MahApps.Styles.GridSplitter}"
+                    TargetType="GridSplitter">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=WorkPanelGrid, Path=Visibility}" 
+                                     Value="{x:Static Visibility.Collapsed}" >
+                                <Setter Property="Visibility" Value="Collapsed"/>
+
+                            </DataTrigger>
+
+                            <!--<EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+
+                                    <ColorAnimation 
+                                        Storyboard.TargetProperty="Background.Color"
+                                        Duration="0:0:0:0"
+                                        >
+                                        <ColorAnimation.To>
+                                            <Color A="160" R="96" G="84" B="175"/>
+                                        </ColorAnimation.To>
+
+                                    </ColorAnimation>
+
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+
+
+                                    <ObjectAnimationUsingKeyFrames  
+                                        Storyboard.TargetProperty="Background.Color">
+                                        <DiscreteObjectKeyFrame KeyTime="0">
+                                            <DiscreteObjectKeyFrame.Value>
+                                                <Color>
+                                                    transparent
+                                                </Color>
+                                            </DiscreteObjectKeyFrame.Value>
+                                        </DiscreteObjectKeyFrame>
+                                    </ObjectAnimationUsingKeyFrames>
+
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>-->
+                        </Style.Triggers>
+
+                    </Style>
+                </GridSplitter.Style>
+
+            </GridSplitter>
+
+
+
+
+
+            <Grid
+           
+            
+            x:Name="WorkPanelGrid"
+            Panel.ZIndex="5000"
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.RowSpan="3"
+            HorizontalAlignment="Center"
+           
+            >
+
+
 
                 <Grid
-                    Grid.Row="0"
-                    >
+                Panel.ZIndex="4000"
+                TextBlock.FontSize="13"
+                >
 
                     <Grid.ColumnDefinitions>
 
-                        <ColumnDefinition 
-                            Width="auto"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
+                        <ColumnDefinition
+                        Width="auto"
+                
+                        
+                    />
 
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock 
-                        VerticalAlignment="Center"
+                    <Grid.RowDefinitions>
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                        <RowDefinition 
+                        Height="auto"
+                    />
+
+                    </Grid.RowDefinitions>
+
+
+
+                    <Canvas
+                    x:Name="BackgroundDrag" 
+                    Panel.ZIndex="13"
+                    Background="Transparent"
+                    Grid.Row="0"
+                    Grid.RowSpan="15"
+                    Margin="-50 0 0 0">
+                        <Canvas.RenderTransform>
+                            <ScaleTransform ScaleX="1.05" ScaleY="15"/>
+                        </Canvas.RenderTransform>
+
+                    </Canvas>
+
+
+
+                    <Grid
+                    Panel.ZIndex="14"
+                    x:Name="GridVolume1"
+                    Grid.Row="0"
+                    Margin="10"
+                    >
+
+
+
+
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                            <ColumnDefinition 
+                            Width="50"
+                        />
+
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock 
+                        Panel.ZIndex="10"
+                        TextAlignment="Center"
+                        Margin="0 0 0 0"
+                        VerticalAlignment="Stretch"
                         Foreground="White"
                         Text="Рабочий объём 1"
                     />
 
-                    <Button
+                        <Button
+                        Margin="0 0 10 0"
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
                         >
 
-                        <Button.Style>
+                            <Button.Style>
 
-                            <Style 
+                                <Style 
                                 BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
                                 TargetType="{x:Type ButtonBase}"
                                 >
 
-                                <Setter 
+                                    <Setter 
                                     Property="Foreground" 
                                     Value="{DynamicResource MahApps.Brushes.Accent}" 
                                 />
 
-                                <Style.Triggers>
+                                    <Style.Triggers>
 
-                                    <Trigger 
+                                        <Trigger 
                                         Property="IsMouseOver"
                                         Value="True"
                                         >
-                                        <Setter 
+                                            <Setter 
                                             Property="BorderBrush" 
                                             Value="{DynamicResource MahApps.Brushes.Accent}" 
                                         />
 
-                                    </Trigger>
+                                        </Trigger>
 
-                                </Style.Triggers>
+                                    </Style.Triggers>
 
-                            </Style>
+                                </Style>
 
-                        </Button.Style>
+                            </Button.Style>
 
-                        <iconPacks:PackIconEntypo 
+                            <iconPacks:PackIconEntypo 
                             Kind="HelpWithCircle"
                             Grid.Column="1"
+                            Visibility="Hidden"
                             >
 
-                            <iconPacks:PackIconEntypo.Foreground>
+                                <iconPacks:PackIconEntypo.Foreground>
 
-                                <SolidColorBrush 
+                                    <SolidColorBrush 
                                     Opacity="0.9"
                                     >
-                                    <SolidColorBrush.Color>
+                                        <SolidColorBrush.Color>
 
-                                        <Color 
+                                            <Color 
                                             A="255" 
                                             R="105" 
                                             G="125"
                                             B="170"
                                         />
 
-                                    </SolidColorBrush.Color>
+                                        </SolidColorBrush.Color>
 
-                                </SolidColorBrush>
+                                    </SolidColorBrush>
 
-                            </iconPacks:PackIconEntypo.Foreground>
+                                </iconPacks:PackIconEntypo.Foreground>
 
-                        </iconPacks:PackIconEntypo>
+                            </iconPacks:PackIconEntypo>
 
-                    </Button>
+                        </Button>
 
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
+
+                        <mah:NumericUpDown
+                        MinWidth="210"
+                        x:Name="NumericUpDownWork1"
                         HorizontalContentAlignment="Center"
                         Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
+                        ChangeValueOnTextChanged ="False"
+                        Culture="{StaticResource Culture}"
+                        StringFormat="{}{0:N4}"
+                        Value="{Binding ValueTemaplete[0],Mode=OneWay}"
                         Minimum="0" 
                         mah:TextBoxHelper.AutoWatermark="True"
                         mah:TextBoxHelper.Watermark="Объём 1"
@@ -449,113 +918,130 @@
                         
                         ToolTip="{Binding RelativeSource={RelativeSource Mode=Self},
                         Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
-                        >
+                       >
 
-                    </mah:NumericUpDown>
 
-                </Grid>
+                        </mah:NumericUpDown>
 
-                <Grid
+                    </Grid>
+
+                    <Grid
+                       Panel.ZIndex="100"
                      Grid.Row="1"
+                    Margin="10"
                     >
 
-                    <Grid.ColumnDefinitions>
 
-                        <ColumnDefinition 
-                            Width="auto"
-                        />
 
-                        <ColumnDefinition 
-                            Width="30"
-                        />
 
-                        <ColumnDefinition 
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition 
                             Width="*"
-                            MaxWidth="120" 
                         />
 
-                    </Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                            Width="50"
+                        />
 
-                    <TextBlock 
-                        VerticalAlignment="Center"
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                        Panel.ZIndex="10"
+                        Margin="0 0 0 0"
+                        TextAlignment="Center"
+                        VerticalAlignment="Stretch"
                         Foreground="White"
                         Text="Рабочий объём 2"
                     />
 
-                    <Button
+                        <Button
                         Grid.Column="1"
+                        Margin="0 0 10 0"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
                         >
 
-                        <Button.Style>
+                            <Button.Style>
 
-                            <Style 
+                                <Style 
                                 BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
                                 TargetType="{x:Type ButtonBase}"
                                 >
 
-                                <Setter 
+                                    <Setter 
                                     Property="Foreground" 
                                     Value="{DynamicResource MahApps.Brushes.Accent}" 
                                 />
 
-                                <Style.Triggers>
+                                    <Style.Triggers>
 
-                                    <Trigger 
+                                        <Trigger 
                                         Property="IsMouseOver"
                                         Value="True"
                                         >
-                                        <Setter 
+                                            <Setter 
                                             Property="BorderBrush" 
                                             Value="{DynamicResource MahApps.Brushes.Accent}" 
                                         />
 
-                                    </Trigger>
+                                        </Trigger>
 
-                                </Style.Triggers>
+                                    </Style.Triggers>
 
-                            </Style>
+                                </Style>
 
-                        </Button.Style>
+                            </Button.Style>
 
-                        <iconPacks:PackIconEntypo 
+                            <iconPacks:PackIconEntypo 
                             Kind="HelpWithCircle"
                             Grid.Column="1"
+                            Visibility="Hidden"
                             >
 
-                            <iconPacks:PackIconEntypo.Foreground>
+                                <iconPacks:PackIconEntypo.Foreground>
 
-                                <SolidColorBrush 
+                                    <SolidColorBrush 
                                     Opacity="0.9"
                                     >
-                                    <SolidColorBrush.Color>
+                                        <SolidColorBrush.Color>
 
-                                        <Color 
+                                            <Color 
                                             A="255" 
                                             R="105" 
                                             G="125"
                                             B="170"
                                         />
 
-                                    </SolidColorBrush.Color>
+                                        </SolidColorBrush.Color>
 
-                                </SolidColorBrush>
+                                    </SolidColorBrush>
 
-                            </iconPacks:PackIconEntypo.Foreground>
+                                </iconPacks:PackIconEntypo.Foreground>
 
-                        </iconPacks:PackIconEntypo>
+                            </iconPacks:PackIconEntypo>
 
-                    </Button>
+                        </Button>
 
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
+                        <mah:NumericUpDown
+                      
+                        Panel.ZIndex="100"
+                        MinWidth="210"
+                        x:Name="NumericUpDownWork2"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
+                      
+                        ChangeValueOnTextChanged ="False"
+                        Culture="{StaticResource Culture}"
+                        StringFormat="{}{0:N4}"
+                        Value="{Binding ValueTemaplete[1],Mode=OneWay}"
                         Minimum="0" 
                         mah:TextBoxHelper.AutoWatermark="True"
                         mah:TextBoxHelper.Watermark="Объём 2"
@@ -567,111 +1053,123 @@
                         Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
                         >
 
-                    </mah:NumericUpDown>
+                        </mah:NumericUpDown>
 
-                </Grid>
+                    </Grid>
 
-                <Grid
-                     Grid.Row="2"                    
+                    <Grid
+                       Panel.ZIndex="100"
+                     Grid.Row="2" 
+                    Margin="10"
                     >
 
-                    <Grid.ColumnDefinitions>
+                        <Grid.ColumnDefinitions>
 
-                        <ColumnDefinition 
-                            Width="auto"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
+                            <ColumnDefinition 
                             Width="*"
-                            MaxWidth="120" 
                         />
 
-                    </Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                            Width="50"
+                        />
 
-                    <TextBlock 
-                        VerticalAlignment="Center"
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                        Panel.ZIndex="10"
+                        Margin="0 0 0 0"
+                        VerticalAlignment="Stretch"
+                        TextAlignment="Center"
                         Foreground="White"
                         Text="Рабочий объём 3"
                     />
 
-                    <Button
+                        <Button
+                        Margin="0 0 10 0"
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
                         >
 
-                        <Button.Style>
+                            <Button.Style>
 
-                            <Style 
+                                <Style 
                                 BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
                                 TargetType="{x:Type ButtonBase}"
                                 >
 
-                                <Setter 
+                                    <Setter 
                                     Property="Foreground" 
                                     Value="{DynamicResource MahApps.Brushes.Accent}" 
                                 />
 
-                                <Style.Triggers>
+                                    <Style.Triggers>
 
-                                    <Trigger 
+                                        <Trigger 
                                         Property="IsMouseOver"
                                         Value="True"
                                         >
-                                        <Setter 
+                                            <Setter 
                                             Property="BorderBrush" 
                                             Value="{DynamicResource MahApps.Brushes.Accent}" 
                                         />
 
-                                    </Trigger>
+                                        </Trigger>
 
-                                </Style.Triggers>
+                                    </Style.Triggers>
 
-                            </Style>
+                                </Style>
 
-                        </Button.Style>
+                            </Button.Style>
 
-                        <iconPacks:PackIconEntypo 
+                            <iconPacks:PackIconEntypo 
                             Kind="HelpWithCircle"
                             Grid.Column="1"
+                            Visibility="Hidden"
                             >
 
-                            <iconPacks:PackIconEntypo.Foreground>
+                                <iconPacks:PackIconEntypo.Foreground>
 
-                                <SolidColorBrush 
+                                    <SolidColorBrush 
                                     Opacity="0.9"
                                     >
-                                    <SolidColorBrush.Color>
+                                        <SolidColorBrush.Color>
 
-                                        <Color 
+                                            <Color 
                                             A="255" 
                                             R="105" 
                                             G="125"
                                             B="170"
                                         />
 
-                                    </SolidColorBrush.Color>
+                                        </SolidColorBrush.Color>
 
-                                </SolidColorBrush>
+                                    </SolidColorBrush>
 
-                            </iconPacks:PackIconEntypo.Foreground>
+                                </iconPacks:PackIconEntypo.Foreground>
 
-                        </iconPacks:PackIconEntypo>
+                            </iconPacks:PackIconEntypo>
 
-                    </Button>
+                        </Button>
 
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
+                        <mah:NumericUpDown
+                        Panel.ZIndex="100"
+                        MinWidth="210"
+                        x:Name="NumericUpDownWork3"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
+                      
+                        ChangeValueOnTextChanged ="False"
+                        Culture="{StaticResource Culture}"
+                        StringFormat="{}{0:N4}"
+                        Value="{Binding ValueTemaplete[2],Mode=OneWay}"
                         Minimum="0" 
                         mah:TextBoxHelper.AutoWatermark="True"
                         mah:TextBoxHelper.Watermark="Объём 3"
@@ -683,111 +1181,123 @@
                         Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
                         >
 
-                    </mah:NumericUpDown>
+                        </mah:NumericUpDown>
 
-                </Grid>
+                    </Grid>
 
-                <Grid  
+                    <Grid  
+                       Panel.ZIndex="100"
                     Grid.Row="3"
+                    Margin="10"
                     >
 
-                    <Grid.ColumnDefinitions>
+                        <Grid.ColumnDefinitions>
 
-                        <ColumnDefinition 
-                            Width="auto"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
+                            <ColumnDefinition 
                             Width="*"
-                            MaxWidth="120" 
                         />
 
-                    </Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                            Width="50"
+                        />
 
-                    <TextBlock 
-                        VerticalAlignment="Center"
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                        Panel.ZIndex="10"
+                        Margin="0 0 0 0"
+                        VerticalAlignment="Stretch"
                         Foreground="White"
                         Text="Рабочий объём 4"
+                        TextAlignment="Center"
                     />
 
-                    <Button
+                        <Button
+                        Margin="0 0 10 0"
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
                         >
 
-                        <Button.Style>
+                            <Button.Style>
 
-                            <Style 
+                                <Style 
                                 BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
                                 TargetType="{x:Type ButtonBase}"
                                 >
 
-                                <Setter 
+                                    <Setter 
                                     Property="Foreground" 
                                     Value="{DynamicResource MahApps.Brushes.Accent}" 
                                 />
 
-                                <Style.Triggers>
+                                    <Style.Triggers>
 
-                                    <Trigger 
+                                        <Trigger 
                                         Property="IsMouseOver"
                                         Value="True"
                                         >
-                                        <Setter 
+                                            <Setter 
                                             Property="BorderBrush" 
                                             Value="{DynamicResource MahApps.Brushes.Accent}" 
                                         />
 
-                                    </Trigger>
+                                        </Trigger>
 
-                                </Style.Triggers>
+                                    </Style.Triggers>
 
-                            </Style>
+                                </Style>
 
-                        </Button.Style>
+                            </Button.Style>
 
-                        <iconPacks:PackIconEntypo 
+                            <iconPacks:PackIconEntypo 
                             Kind="HelpWithCircle"
                             Grid.Column="1"
+                            Visibility="Hidden"
                             >
 
-                            <iconPacks:PackIconEntypo.Foreground>
+                                <iconPacks:PackIconEntypo.Foreground>
 
-                                <SolidColorBrush 
+                                    <SolidColorBrush 
                                     Opacity="0.9"
                                     >
-                                    <SolidColorBrush.Color>
+                                        <SolidColorBrush.Color>
 
-                                        <Color 
+                                            <Color 
                                             A="255" 
                                             R="105" 
                                             G="125"
                                             B="170"
                                         />
 
-                                    </SolidColorBrush.Color>
+                                        </SolidColorBrush.Color>
 
-                                </SolidColorBrush>
+                                    </SolidColorBrush>
 
-                            </iconPacks:PackIconEntypo.Foreground>
+                                </iconPacks:PackIconEntypo.Foreground>
 
-                        </iconPacks:PackIconEntypo>
+                            </iconPacks:PackIconEntypo>
 
-                    </Button>
+                        </Button>
 
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
+                        <mah:NumericUpDown
+                        Panel.ZIndex="100"
+                        MinWidth="210"
+                        x:Name="NumericUpDownWork4"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
+                       
+                        ChangeValueOnTextChanged ="False"
+                        Culture="{StaticResource Culture}"
+                        StringFormat="{}{0:N4}"
+                        Value="{Binding ValueTemaplete[3],Mode=OneWay}"
                         Minimum="0" 
                         mah:TextBoxHelper.AutoWatermark="True"
                         mah:TextBoxHelper.Watermark="Объём 4"
@@ -799,111 +1309,124 @@
                         Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
                         >
 
-                    </mah:NumericUpDown>
+                        </mah:NumericUpDown>
 
-                </Grid>
+                    </Grid>
 
-                <Grid
+                    <Grid  
+                       Panel.ZIndex="100"
                     Grid.Row="4"
+                    Margin="10"
                     >
 
-                    <Grid.ColumnDefinitions>
+                        <Grid.ColumnDefinitions>
 
-                        <ColumnDefinition 
-                            Width="auto"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
+                            <ColumnDefinition 
                             Width="*"
-                            MaxWidth="120" 
                         />
 
-                    </Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                            Width="50"
+                        />
 
-                    <TextBlock 
-                        VerticalAlignment="Center"
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                        Panel.ZIndex="10"
+                        Margin="0 0 0 0"
+                        VerticalAlignment="Stretch"
                         Foreground="White"
                         Text="Рабочий объём 5"
+                        TextAlignment="Center"
                     />
 
-                    <Button
+                        <Button
+                        Margin="0 0 10 0"
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
                         >
 
-                        <Button.Style>
+                            <Button.Style>
 
-                            <Style 
+                                <Style 
                                 BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
                                 TargetType="{x:Type ButtonBase}"
                                 >
 
-                                <Setter 
+                                    <Setter 
                                     Property="Foreground" 
                                     Value="{DynamicResource MahApps.Brushes.Accent}" 
                                 />
 
-                                <Style.Triggers>
+                                    <Style.Triggers>
 
-                                    <Trigger 
+                                        <Trigger 
                                         Property="IsMouseOver"
                                         Value="True"
                                         >
-                                        <Setter 
+                                            <Setter 
                                             Property="BorderBrush" 
                                             Value="{DynamicResource MahApps.Brushes.Accent}" 
                                         />
 
-                                    </Trigger>
+                                        </Trigger>
 
-                                </Style.Triggers>
+                                    </Style.Triggers>
 
-                            </Style>
+                                </Style>
 
-                        </Button.Style>
+                            </Button.Style>
 
-                        <iconPacks:PackIconEntypo 
+                            <iconPacks:PackIconEntypo 
                             Kind="HelpWithCircle"
                             Grid.Column="1"
+                            Visibility="Hidden"
                             >
 
-                            <iconPacks:PackIconEntypo.Foreground>
+                                <iconPacks:PackIconEntypo.Foreground>
 
-                                <SolidColorBrush 
+                                    <SolidColorBrush 
                                     Opacity="0.9"
                                     >
-                                    <SolidColorBrush.Color>
+                                        <SolidColorBrush.Color>
 
-                                        <Color 
+                                            <Color 
                                             A="255" 
                                             R="105" 
                                             G="125"
                                             B="170"
                                         />
 
-                                    </SolidColorBrush.Color>
+                                        </SolidColorBrush.Color>
 
-                                </SolidColorBrush>
+                                    </SolidColorBrush>
 
-                            </iconPacks:PackIconEntypo.Foreground>
+                                </iconPacks:PackIconEntypo.Foreground>
 
-                        </iconPacks:PackIconEntypo>
+                            </iconPacks:PackIconEntypo>
 
-                    </Button>
+                        </Button>
 
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
+                        <mah:NumericUpDown
+                        
+                        Panel.ZIndex="100"
+                        MinWidth="210"
+                        x:Name="NumericUpDownWork5"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
+                       
+                        ChangeValueOnTextChanged ="False"
+                        Culture="{StaticResource Culture}"
+                        StringFormat="{}{0:N4}"
+                        Value="{Binding ValueTemaplete[4],Mode=OneWay}"
                         Minimum="0" 
                         mah:TextBoxHelper.AutoWatermark="True"
                         mah:TextBoxHelper.Watermark="Объём 5"
@@ -915,1160 +1438,652 @@
                         Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
                         >
 
-                    </mah:NumericUpDown>
+                        </mah:NumericUpDown>
 
-                </Grid>
+                    </Grid>
 
-                <Grid
+
+
+                    <Grid
+                       Panel.ZIndex="100"
                     Grid.Row="5"
+                    Margin="10"
+                    
                     >
 
-                    <Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
 
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
+                            <RowDefinition/>
 
-                        <ColumnDefinition 
-                            Width="30"
-                        />
+                            <RowDefinition/>
 
-                        <ColumnDefinition 
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition 
                             Width="*"
-                            MaxWidth="120" 
                         />
 
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-
-                        <RowDefinition 
-                            Height="*"                       
+                            <ColumnDefinition 
+                            Width="50"
                         />
 
-                    </Grid.RowDefinitions>
-
-
-
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Foreground="White"
-                        TextWrapping="Wrap"
-                        Text="Дальность заброса лимитных заявок"
-                        TextAlignment="Center"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
-                        Minimum="0" 
-                        mah:TextBoxHelper.AutoWatermark="True"
-                        mah:TextBoxHelper.Watermark="Дальность"
-                        mah:TextBoxHelper.IsMonitoring="True"
-                        ButtonsAlignment="Opposite"
-                        TextAlignment="Center"
-                        
-                        ToolTip="{Binding RelativeSource={RelativeSource Mode=Self},
-                        Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
-                        >
-
-                    </mah:NumericUpDown>
-
-                </Grid>
-
-                <Grid
-                    Grid.Row="6"
-                    >
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
+                            <ColumnDefinition 
                             Width="*"
-                            MaxWidth="120" 
                         />
 
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-
-                        <RowDefinition 
-                            Height="*"                       
-                        />
-
-                    </Grid.RowDefinitions>
-
-
-
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Foreground="White"
-                        TextWrapping="Wrap"
-                        Text="Дальность заброса от стоп-заявок"
-                        TextAlignment="Center"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
-                        Minimum="0" 
-                        mah:TextBoxHelper.AutoWatermark="True"
-                        mah:TextBoxHelper.Watermark="Дальность"
-                        mah:TextBoxHelper.IsMonitoring="True"
-                        ButtonsAlignment="Opposite"
-                        TextAlignment="Center"
-                        
-                        ToolTip="{Binding RelativeSource={RelativeSource Mode=Self},
-                        Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
-                        >
-
-                    </mah:NumericUpDown>
-
-                </Grid>
-
-                <Grid
-                    Grid.Row="7"
-                    >
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
-
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Text="Stop-loss"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
-                        Minimum="0" 
-                        mah:TextBoxHelper.AutoWatermark="True"
-                        mah:TextBoxHelper.Watermark="Stop-loss"
-                        mah:TextBoxHelper.IsMonitoring="True"
-                        ButtonsAlignment="Opposite"
-                        TextAlignment="Center"
-                        
-                        ToolTip="{Binding RelativeSource={RelativeSource Mode=Self},
-                        Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
-                        >
-
-                    </mah:NumericUpDown>
-
-                </Grid>
-
-                <Grid
-                    Grid.Row="8"
-                    >
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
-
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Text="Take-Profit"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <mah:NumericUpDown                       
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        
-                        Minimum="0" 
-                        mah:TextBoxHelper.AutoWatermark="True"
-                        mah:TextBoxHelper.Watermark="Take-Profit"
-                        mah:TextBoxHelper.IsMonitoring="True"
-                        ButtonsAlignment="Opposite"
-                        TextAlignment="Center"
-                        
-                        ToolTip="{Binding RelativeSource={RelativeSource Mode=Self},
-                        Converter={StaticResource NumberConvetorSpace},Path=Value,Mode=OneWay}"                                            
-                        >
-
-                    </mah:NumericUpDown>
-
-                </Grid>
-
-                <Grid
-                    Grid.Row="9"
-                    >
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
-
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Text="Срабатывание стоп-заявок"
-                        TextWrapping="Wrap"
-                        TextAlignment="Center"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <ComboBox                    
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        SelectedIndex="0"
-                        >
-
-                        <ComboBox.Items>
-
-                            <ComboBoxItem 
-                                Content="По сделкам"
-                            />
-
-                            <ComboBoxItem 
-                                Content="Что-то там ещё?"
-                            />
-
-                        </ComboBox.Items>
-
-                    </ComboBox>
-
-                </Grid>
-
-                <Grid
-                    Grid.Row="10"
-                    >
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
-
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Text="Размещение Stop-loss/Take-profit"
-                        TextWrapping="Wrap"
-                        TextAlignment="Center"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <ComboBox                    
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        SelectedIndex="0"
-                        >
-
-                        <ComboBox.Items>
-
-                            <ComboBoxItem 
-                                Content="На сервере"                           
-                             />
-
-                            <ComboBoxItem 
-                                Content="Локально?"
-                            />
-
-                        </ComboBox.Items>
-
-                    </ComboBox>
-
-                </Grid>
-
-                <Grid
-                    Grid.Row="11"
-                    >
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
-
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Text="Уведомление: совершена сделка"
-                        TextWrapping="Wrap"
-                        TextAlignment="Center"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <mah:ToggleSwitch
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        Grid.Column="2"
-                        Margin="25 -10 0 0"
-                        
-                        OffContent="{x:Null}"
-                        OnContent="{x:Null}" Height="37"
-                        >
-
-                        <mah:ToggleSwitch.RenderTransform>
-                            <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
-                        </mah:ToggleSwitch.RenderTransform>
-
-                    </mah:ToggleSwitch>
-
-
-
-                </Grid>
-
-                <Grid
-                    Grid.Row="12"
-                    >
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
-
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Text="Отображение прибыли"
-                        TextWrapping="Wrap"
-                        TextAlignment="Center"
-                    />
-
-                    <Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo 
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <ComboBox                    
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Grid.Column="3"
-                        MinWidth="114"
-                        MaxWidth="114"
-                        SelectedIndex="0"
-                        >
-
-                        <ComboBox.Items>
-
-                            <ComboBoxItem 
-                                Content="Проценты"                           
-                             />
-
-                            <ComboBoxItem 
-                                Content="Фактическое?"
-                            />
-
-                        </ComboBox.Items>
-
-                    </ComboBox>
-
-                </Grid>
-
-
-                <Grid
-                    Grid.Row="13"
-                    >
-
-                    <Grid.RowDefinitions>
-
-                        <RowDefinition/>
-
-                        <RowDefinition/>
-
-                    </Grid.RowDefinitions>
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition 
-                            Width="104.363"
-                        />
-
-                        <ColumnDefinition 
-                            Width="30"
-                        />
-
-                        <ColumnDefinition 
-                            Width="*"
-                            MaxWidth="120" 
-                        />
-
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        Grid.Column="0"
-                        Grid.Row="0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Text="Тип выгрузки"
-                        TextWrapping="Wrap"
-                        TextAlignment="Center"
-                    />
-
-                    <ComboBox 
-                        Grid.Row="1"
-                        SelectedIndex="1"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        >
-                        
-
-                        <ComboBox.Items>
-
-                            <ComboBoxItem Content="XML"/>
-
-                            <ComboBoxItem Content="JSON"/>
-
-
-                        </ComboBox.Items>
-                        
-                    </ComboBox>
-
-                    <Button
-                        Grid.Column="1"
-                        Grid.RowSpan="2"
-                           
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        >
-
-                        <Button.Style>
-
-                            <Style 
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}"
-                                >
-
-                                <Setter 
-                                    Property="Foreground" 
-                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                />
-
-                                <Style.Triggers>
-
-                                    <Trigger 
-                                        Property="IsMouseOver"
-                                        Value="True"
-                                        >
-                                        <Setter 
-                                            Property="BorderBrush" 
-                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
-                                        />
-
-                                    </Trigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                        <iconPacks:PackIconEntypo
-                           
-
-                            Kind="HelpWithCircle"
-                            Grid.Column="1"
-                            >
-
-                            <iconPacks:PackIconEntypo.Foreground>
-
-                                <SolidColorBrush 
-                                    Opacity="0.9"
-                                    >
-                                    <SolidColorBrush.Color>
-
-                                        <Color 
-                                            A="255" 
-                                            R="105" 
-                                            G="125"
-                                            B="170"
-                                        />
-
-                                    </SolidColorBrush.Color>
-
-                                </SolidColorBrush>
-
-                            </iconPacks:PackIconEntypo.Foreground>
-
-                        </iconPacks:PackIconEntypo>
-
-                    </Button>
-
-                    <Button
-                        Margin="0 5 0 5"
-                        Grid.Column="2"
-                        Grid.RowSpan="2"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        >
-
-
+                        </Grid.ColumnDefinitions>
 
                         <TextBlock
-                            TextTrimming="WordEllipsis"
-                            Margin="0 -3 0 0"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            TextAlignment="Center"
-                            TextWrapping="Wrap"
-                            Text="Выгрузить" 
-                            Opacity="0.6"
-                            FontSize="12" 
-                        >
-                            <TextBlock.LayoutTransform>
-                                <TransformGroup>
-                                    <ScaleTransform ScaleX="1.25" ScaleY="1.25"/>
-                                    <SkewTransform/>
-                                    <RotateTransform/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </TextBlock.LayoutTransform>
+                        Panel.ZIndex="10"
+                        Margin="0 0 0 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="White"
+                        
+                        TextAlignment="Center"
+                    >
+                            <TextBlock.Inlines>
+                                <Run Text="Новый шаблон"/>
+                                <LineBreak/>
+                                <Run Text="для всех"/>
+                            </TextBlock.Inlines>
+
+
+
                         </TextBlock>
 
 
 
+                        <Button
+                        Margin="0 0 10 0"
+                        Grid.Column="1"
+                        Grid.RowSpan="2"
+                           
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
+                        >
 
-                    </Button>
+                            <Button.Style>
+
+                                <Style 
+                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
+                                TargetType="{x:Type ButtonBase}"
+                                >
+
+                                    <Setter 
+                                    Property="Foreground" 
+                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
+                                />
+
+                                    <Style.Triggers>
+
+                                        <Trigger 
+                                        Property="IsMouseOver"
+                                        Value="True"
+                                        >
+                                            <Setter 
+                                            Property="BorderBrush" 
+                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
+                                        />
+
+                                        </Trigger>
+
+                                    </Style.Triggers>
+
+                                </Style>
+
+                            </Button.Style>
+
+                            <iconPacks:PackIconEntypo
+                           
+                           Visibility="Hidden"
+                            Kind="HelpWithCircle"
+                            Grid.Column="1"
+                            >
+
+                                <iconPacks:PackIconEntypo.Foreground>
+
+                                    <SolidColorBrush 
+                                    Opacity="0.9"
+                                    >
+                                        <SolidColorBrush.Color>
+
+                                            <Color 
+                                            A="255" 
+                                            R="105" 
+                                            G="125"
+                                            B="170"
+                                        />
+
+                                        </SolidColorBrush.Color>
+
+                                    </SolidColorBrush>
+
+                                </iconPacks:PackIconEntypo.Foreground>
+
+                            </iconPacks:PackIconEntypo>
+
+                        </Button>
+
+                        <Button
+
+                        Panel.ZIndex="100"
+                        x:Name="ButtonTemplateALL"
+                        Height="auto"
+                        MinWidth="210"
+                        Width="auto"
+                        Grid.Column="2"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Margin="0 0 0 0"
+                        >
+
+                            <ContentControl
+                            Opacity="0.6"  
+                            FontSize="16" >
+                                <Run>Применить</Run>
+
+                                <ContentControl.LayoutTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </ContentControl.LayoutTransform>
+
+                            </ContentControl>
+
+
+
+
+                        </Button>
+
+                    </Grid>
+
+                    <Grid
+                       Panel.ZIndex="100"
+                    Grid.Row="7"
+                    Margin="10"
+                    
+                    >
+
+                        <Grid.RowDefinitions>
+
+                            <RowDefinition/>
+
+                            <RowDefinition/>
+
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                            <ColumnDefinition 
+                            Width="50"
+                        />
+
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                        Panel.ZIndex="10"
+                        Margin="0 0 0 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="White"
+                        
+                        TextAlignment="Center"
+                    >
+                            <TextBlock.Inlines>
+                                <Run Text="Выгрузить по указанной"/>
+                                <LineBreak/>
+                                <Run Text="диерктории"/>
+                            </TextBlock.Inlines>
+
+
+
+                        </TextBlock>
+
+
+
+                        <Button
+                        Margin="0 0 10 0"
+                        Grid.Column="1"
+                        Grid.RowSpan="2"
+                           
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
+                        >
+
+                            <Button.Style>
+
+                                <Style 
+                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
+                                TargetType="{x:Type ButtonBase}"
+                                >
+
+                                    <Setter 
+                                    Property="Foreground" 
+                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
+                                />
+
+                                    <Style.Triggers>
+
+                                        <Trigger 
+                                        Property="IsMouseOver"
+                                        Value="True"
+                                        >
+                                            <Setter 
+                                            Property="BorderBrush" 
+                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
+                                        />
+
+                                        </Trigger>
+
+                                    </Style.Triggers>
+
+                                </Style>
+
+                            </Button.Style>
+
+                            <iconPacks:PackIconEntypo
+                           
+                            Visibility="Hidden"
+                            Kind="HelpWithCircle"
+                            Grid.Column="1"
+                            >
+
+                                <iconPacks:PackIconEntypo.Foreground>
+
+                                    <SolidColorBrush 
+                                    Opacity="0.9"
+                                    >
+                                        <SolidColorBrush.Color>
+
+                                            <Color 
+                                            A="255" 
+                                            R="105" 
+                                            G="125"
+                                            B="170"
+                                        />
+
+                                        </SolidColorBrush.Color>
+
+                                    </SolidColorBrush>
+
+                                </iconPacks:PackIconEntypo.Foreground>
+
+                            </iconPacks:PackIconEntypo>
+
+                        </Button>
+
+                        <Button
+                        Panel.ZIndex="100"
+                        x:Name="ButtonOverwriteAllFiles"
+                        Height="auto"
+                        MinWidth="210"
+                        Width="auto"
+                        Grid.Column="2"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Margin="0 0 0 0"
+                        >
+
+                            <ContentControl
+                            Opacity="0.6"  
+                            FontSize="16" >
+                                <Run>Выгрузить</Run>
+
+
+                            </ContentControl>
+
+
+
+
+                        </Button>
+
+                    </Grid>
+
+                    <Grid
+                       Panel.ZIndex="100"
+                    Grid.Row="6"
+                    Margin="10"
+                    
+                    >
+
+                        <Grid.RowDefinitions>
+
+                            <RowDefinition/>
+
+                            <RowDefinition/>
+
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                            <ColumnDefinition 
+                            Width="50"
+                        />
+
+                            <ColumnDefinition 
+                            Width="*"
+                        />
+
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                        Panel.ZIndex="10"
+                        Margin="0 0 0 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="White"
+                        
+                        TextAlignment="Center"
+                    >
+                            <TextBlock.Inlines>
+                                <Run Text="Выбрать новую"/>
+                                <LineBreak/>
+                                <Run Text="директорию"/>
+                            </TextBlock.Inlines>
+
+
+
+                        </TextBlock>
+
+
+
+                        <Button
+                        Margin="0 0 10 0"
+                        Grid.Column="1"
+                        Grid.RowSpan="2"
+                           
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Visibility="Hidden"
+                        >
+
+                            <Button.Style>
+
+                                <Style 
+                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
+                                TargetType="{x:Type ButtonBase}"
+                                >
+
+                                    <Setter 
+                                    Property="Foreground" 
+                                    Value="{DynamicResource MahApps.Brushes.Accent}" 
+                                />
+
+                                    <Style.Triggers>
+
+                                        <Trigger 
+                                        Property="IsMouseOver"
+                                        Value="True"
+                                        >
+                                            <Setter 
+                                            Property="BorderBrush" 
+                                            Value="{DynamicResource MahApps.Brushes.Accent}" 
+                                        />
+
+                                        </Trigger>
+
+                                    </Style.Triggers>
+
+                                </Style>
+
+                            </Button.Style>
+
+                            <iconPacks:PackIconEntypo
+                           
+                           
+                            Kind="HelpWithCircle"
+                            Grid.Column="1"
+                            Visibility="Hidden"
+                            >
+
+                                <iconPacks:PackIconEntypo.Foreground>
+
+                                    <SolidColorBrush 
+                                    Opacity="0.9"
+                                    >
+                                        <SolidColorBrush.Color>
+
+                                            <Color 
+                                            A="255" 
+                                            R="105" 
+                                            G="125"
+                                            B="170"
+                                        />
+
+                                        </SolidColorBrush.Color>
+
+                                    </SolidColorBrush>
+
+                                </iconPacks:PackIconEntypo.Foreground>
+
+                            </iconPacks:PackIconEntypo>
+
+                        </Button>
+
+                        <Button
+                        Panel.ZIndex="100"
+                        x:Name="ButtonNewDirectory"
+                        Height="auto"
+                        MinWidth="210"
+                        Width="auto"
+                        Grid.Column="2"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Margin="0 0 0 0"
+                        >
+
+                            <ContentControl
+                            Opacity="0.6"  
+                            FontSize="16" >
+                                <Run>Выбрать</Run>
+
+                                <ContentControl.LayoutTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </ContentControl.LayoutTransform>
+
+                            </ContentControl>
+
+
+
+
+                        </Button>
+
+                    </Grid>
+
+                    <ContentControl 
+                    Grid.Row="8"
+                    Panel.ZIndex="100"
+                    Width="{Binding ElementName=GridVolume1,Path=ActualWidth}"
+                    >
+
+                        <ContentControl.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+
+                                <EventTrigger.Actions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames 
+                                            Storyboard.TargetName="BorderPath" 
+                                            Storyboard.TargetProperty="(Border.BorderBrush)">
+                                                <DiscreteObjectKeyFrame 
+                                                KeyTime="0"                                                
+                                                >
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <SolidColorBrush Opacity="0.8" Color="WhiteSmoke"/>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames
+                                            Storyboard.TargetName="ButtonOpenDirectory"
+                                            Storyboard.TargetProperty="(UIElement.Visibility)"
+                                            >
+                                                <DiscreteObjectKeyFrame 
+                                                KeyTime="0"                                                
+                                                >
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Visible</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+
+
+                                </EventTrigger.Actions>
+
+
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <EventTrigger.Actions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames
+                                            Storyboard.TargetName="BorderPath" 
+                                            Storyboard.TargetProperty="(Border.BorderBrush)"
+                                            >
+                                                <DiscreteObjectKeyFrame 
+                                                KeyTime="0"                                                
+                                                >
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <SolidColorBrush Opacity="0.6" Color="WhiteSmoke"/>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+
+                                    </BeginStoryboard>
+
+                                </EventTrigger.Actions>
+                            </EventTrigger>
+                        </ContentControl.Triggers>
+                        <Border
+                       
+                        x:Name="BorderPath"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="-25 10 0 0"
+                        >
+                            <Border.BorderBrush>
+                                <SolidColorBrush Opacity="0.6" Color="WhiteSmoke"/>
+                            </Border.BorderBrush>
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                            </Border.RenderTransform>
+
+                            <Grid>
+                                <TextBlock
+                                 Visibility="Visible"
+                                 x:Name="TextBlockPathDirectory"
+                                 Margin="10 3 10 3"
+                                 Text="{Binding DataManagement.SavePath}"
+                                 Foreground="White"
+                                 TextTrimming="None"
+                                 HorizontalAlignment="Right"
+                                 FontSize="14" 
+                                 TextWrapping="NoWrap"
+                                     
+                                 >
+                                </TextBlock>
+                                <Button
+                                     Visibility="Collapsed"
+                                     x:Name="ButtonOpenDirectory"
+                                     Height="auto"
+                                     MinWidth="140"
+                                     Width="auto"
+                                     Grid.Column="2"
+                                     VerticalAlignment="Stretch"
+                                     HorizontalAlignment="Stretch"
+                                     Margin="0 0 0 0"
+                                   
+                                     >
+                                    <!--<Button.Triggers>
+                                    <EventTrigger RoutedEvent="MouseLeave">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames
+                                                    Storyboard.TargetName="TextBlockPathDirectory"
+                                                    Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                    >
+                                                    <DiscreteObjectKeyFrame 
+                                                        KeyTime="0"                                                
+                                                        >
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Visible</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames
+                                                    Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                    >
+                                                    <DiscreteObjectKeyFrame 
+                                                        KeyTime="0"                                                
+                                                        >
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Collapsed</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Button.Triggers>-->
+
+                                    <ContentControl
+                                     Opacity="0.6"  
+                                     FontSize="16" >
+                                        <Run>Открыть целевую папку</Run>
+
+
+
+                                    </ContentControl>
+
+
+
+
+                                </Button>
+                            </Grid>
+
+                        </Border>
+
+
+
+                    </ContentControl>
+
+
+
 
                 </Grid>
 
+
+
             </Grid>
 
-
-
-        </Grid>
-
-        <ScrollViewer
+            <ScrollViewer
             x:Name="ScrollViewerData"
             Grid.Column="1"
             Grid.ColumnSpan="3"
@@ -2076,55 +2091,55 @@
             Grid.Row="1"                      
             >
 
-            <ScrollViewer.Style>
+                <ScrollViewer.Style>
 
-                <Style 
+                    <Style 
                     BasedOn="{StaticResource MahApps.Styles.ScrollViewer}" 
                     TargetType="ScrollViewer"
                     >
 
-                    <Setter 
+                        <Setter 
                         Property="Template"
                         >
 
-                        <Setter.Value>
+                            <Setter.Value>
 
-                            <ControlTemplate 
+                                <ControlTemplate 
                                 TargetType="{x:Type ScrollViewer}"
                                 >
 
-                                <Grid 
+                                    <Grid 
                                     Name="Grid" 
                                     Background="{TemplateBinding Background}"
                                     >
 
-                                    <Grid.ColumnDefinitions>
+                                        <Grid.ColumnDefinitions>
 
-                                        <ColumnDefinition 
+                                            <ColumnDefinition 
                                             Name="leftColumn" 
                                             Width="*" 
                                         />
 
-                                        <ColumnDefinition 
+                                            <ColumnDefinition 
                                             Name="rightColumn" 
                                             Width="30"                                            
                                         />
 
-                                    </Grid.ColumnDefinitions>
+                                        </Grid.ColumnDefinitions>
 
-                                    <Grid.RowDefinitions>
+                                        <Grid.RowDefinitions>
 
-                                        <RowDefinition 
+                                            <RowDefinition 
                                             Height="*" 
                                         />
 
-                                        <RowDefinition 
+                                            <RowDefinition 
                                             Height="Auto" 
                                         />
 
-                                    </Grid.RowDefinitions>
+                                        </Grid.RowDefinitions>
 
-                                    <ScrollContentPresenter 
+                                        <ScrollContentPresenter 
                                         Name="PART_ScrollContentPresenter" 
                                         Grid.Row="0" 
                                         Grid.Column="0" 
@@ -2135,7 +2150,7 @@
                                         ContentTemplate="{TemplateBinding ContentTemplate}" 
                                     />
 
-                                    <ScrollBar  
+                                        <ScrollBar  
                                         Name="PART_VerticalScrollBar"
                                         Grid.Row="0" 
                                         Grid.Column="1" 
@@ -2148,9 +2163,9 @@
                                         Margin="0 21.9 0 0"
                                         >
 
-                                    </ScrollBar>
+                                        </ScrollBar>
 
-                                    <ScrollBar 
+                                        <ScrollBar 
                                         Name="PART_HorizontalScrollBar" 
                                         Grid.Row="1" 
                                         Grid.Column="0" 
@@ -2162,27 +2177,28 @@
                                         Value="{Binding HorizontalOffset , Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" 
                                     />
 
-                                </Grid>
+                                    </Grid>
 
-                            </ControlTemplate>
+                                </ControlTemplate>
 
-                        </Setter.Value>
+                            </Setter.Value>
 
-                    </Setter>
+                        </Setter>
 
-                    <Setter 
+                        <Setter 
                         Property="mah:ScrollViewerHelper.VerticalScrollBarOnLeftSide" 
                         Value="False" 
                     />
 
-                </Style>
+                    </Style>
 
-            </ScrollViewer.Style>
+                </ScrollViewer.Style>
 
-            <DataGrid 
+                <DataGrid 
+                Margin="10 0 0 0"
                 ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle0000}"
                 Grid.RowSpan="2"
-                Grid.Column="2"
+                Grid.Column="1"
                 Grid.ColumnSpan="1"
                 Grid.Row="1"     
                 x:Name="Data"
@@ -2209,218 +2225,554 @@
 
 
 
-                <DataGrid.Resources>
+                    <DataGrid.Resources>
 
-                    <Style 
+                        <Style 
                         BasedOn="{mah:StaticResource MahApps.Styles.ScrollBar}" 
                         TargetType="ScrollBar">
 
-                        <Setter 
+                            <Setter 
                             Property="Margin" 
                             Value="-20 0 0 0"
                         />
 
-                    </Style>
+                        </Style>
 
-                </DataGrid.Resources>
+                    </DataGrid.Resources>
 
-                <DataGrid.CellStyle>
+                    <DataGrid.CellStyle>
 
-                    <Style 
+                        <Style 
                         TargetType="{x:Type DataGridCell}" 
                         >
 
-                        <EventSetter 
+                            <EventSetter 
                             Event="PreviewMouseLeftButtonDown" 
                             Handler="DataGridCell_PreviewMouseLeftButtonDown" 
                             >
 
-                        </EventSetter>
+                            </EventSetter>
 
-                        <Style.Triggers>
+                            <Style.Triggers>
 
-                            <Trigger 
+                                <Trigger 
                                 Property="IsSelected" 
                                 Value="True"
                                 >
 
-                                <Setter 
+                                    <Setter 
                                     Property="Background"
                                     >
 
-                                    <Setter.Value>
+                                        <Setter.Value>
 
-                                        <SolidColorBrush>
+                                            <SolidColorBrush>
 
-                                            <SolidColorBrush.Color>
+                                                <SolidColorBrush.Color>
 
-                                                <Color 
+                                                    <Color 
                                                     A="100" 
                                                     R="96"
                                                     G="84" 
                                                     B="175"
                                                 />
 
-                                            </SolidColorBrush.Color>
+                                                </SolidColorBrush.Color>
 
-                                        </SolidColorBrush>
+                                            </SolidColorBrush>
 
-                                    </Setter.Value>
+                                        </Setter.Value>
 
-                                </Setter>
+                                    </Setter>
 
-                            </Trigger>
+                                </Trigger>
 
-                        </Style.Triggers>
+                            </Style.Triggers>
 
-                    </Style>
+                        </Style>
 
-                </DataGrid.CellStyle>
-
-
+                    </DataGrid.CellStyle>
 
 
 
-                <DataGrid.AlternatingRowBackground>
 
-                    <SolidColorBrush>
 
-                        <SolidColorBrush.Color>
+                    <DataGrid.AlternatingRowBackground>
 
-                            <Color 
+                        <SolidColorBrush>
+
+                            <SolidColorBrush.Color>
+
+                                <Color 
                                 A="220" 
                                 R="31" 
                                 G="31" 
                                 B="31"
                             />
 
-                        </SolidColorBrush.Color>
+                            </SolidColorBrush.Color>
 
-                    </SolidColorBrush>
+                        </SolidColorBrush>
 
-                </DataGrid.AlternatingRowBackground>
+                    </DataGrid.AlternatingRowBackground>
 
-                <DataGrid.RowBackground>
+                    <DataGrid.RowBackground>
 
-                    <SolidColorBrush >
+                        <SolidColorBrush >
 
-                        <SolidColorBrush.Color>
+                            <SolidColorBrush.Color>
 
-                            <Color 
+                                <Color 
                                 A="220" 
                                 R="26" 
                                 G="26" 
                                 B="26"
                             />
 
-                        </SolidColorBrush.Color>
+                            </SolidColorBrush.Color>
 
-                    </SolidColorBrush>
+                        </SolidColorBrush>
 
-                </DataGrid.RowBackground>
+                    </DataGrid.RowBackground>
 
 
-                <DataGrid.Columns >
+                    <DataGrid.Columns >
 
-                    <DataGridTemplateColumn 
+                        <DataGridTemplateColumn 
                         IsReadOnly="True"
                         Width="SizetoHeader"
                         Header="Моненты"                            
                         DisplayIndex="0"
                         >
 
-                        <DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellTemplate>
 
-                            <DataTemplate>
+                                <DataTemplate>
 
-                                <UniformGrid 
+                                    <UniformGrid 
                                     VerticalAlignment="Center"
                                     >
 
-                                    <TextBlock
+                                        <TextBlock
                                         VerticalAlignment="Stretch" 
                                         HorizontalAlignment="Stretch"
                                         TextAlignment="Left"                                     
                                         Text="{Binding CurrencyObject.Symbol}"                                        
                                     />
 
-                                </UniformGrid>
+                                    </UniformGrid>
 
-                            </DataTemplate>
+                                </DataTemplate>
 
-                        </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
 
-                    </DataGridTemplateColumn>
+                        </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn 
+                        <DataGridTemplateColumn 
                             Header="Цена"
                             DisplayIndex="1"
                             Width="SizetoHeader"
                             >
 
-                        <DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellTemplate>
 
-                            <DataTemplate>
+                                <DataTemplate>
 
-                                <TextBlock 
+                                    <TextBlock 
                                         VerticalAlignment="Center" 
                                         HorizontalAlignment="Left"
                                         Text="{Binding CurrencyObject.Price}"
                                 />
 
-                            </DataTemplate>
+                                </DataTemplate>
 
-                        </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
 
-                    </DataGridTemplateColumn>
+                        </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn 
-                        DisplayIndex="3"
+                        <DataGridTemplateColumn 
+                            Header="Шаг"
+                            DisplayIndex="2"
+                            Width="SizetoHeader"
+                            >
+
+                            <DataGridTemplateColumn.CellTemplate>
+
+                                <DataTemplate>
+
+                                    <TextBlock 
+                                        VerticalAlignment="Center" 
+                                        HorizontalAlignment="Left"
+                                        Text="{Binding CurrencyObject.StepSize}"
+                                />
+
+                                </DataTemplate>
+
+                            </DataGridTemplateColumn.CellTemplate>
+
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn 
+                        DisplayIndex="4"
                         Width="SizetoHeader"
                         Header="Локальное время"
                         >
 
-                        <DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellTemplate>
 
-                            <DataTemplate>
+                                <DataTemplate>
 
-                                <TextBlock 
+                                    <TextBlock 
                                     VerticalAlignment="Center" 
                                     HorizontalAlignment="Left"
                                     Text="{Binding CurrencyObject.LocalTime, StringFormat=dd/MM/yyyy HH:mm:ss, ConverterCulture = ru-RU}"                                        
                                 />
 
-                            </DataTemplate>
+                                </DataTemplate>
 
-                        </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
 
-                    </DataGridTemplateColumn>
+                        </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn 
-                        DisplayIndex="2"
+                        <DataGridTemplateColumn 
+                        DisplayIndex="3"
                         Width="170"
                         Header="Объёмы"
+                        Visibility="Collapsed"
                         >
 
-                        <DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellTemplate>
 
-                            <DataTemplate >
+                                <DataTemplate >
 
-                                <ComboBox 
+                                    <ComboBox 
                                     Background="Transparent"  
-                                    ItemsSource="{Binding DataVolume}"
+                                    ItemsSource="{Binding DataVolumeTemp}"
                                     IsHitTestVisible="True"
                                     >
 
-                                    <ComboBox.BindingGroup>
+                                        <ComboBox.BindingGroup>
 
-                                        <BindingGroup 
+                                            <BindingGroup 
                                             Name="ComboBoxGroup"
                                         />
 
-                                    </ComboBox.BindingGroup>
+                                        </ComboBox.BindingGroup>
 
-                                    <ComboBox.ItemTemplate>
+                                        <ComboBox.Style>
+                                            <Style 
+                                            BasedOn="{mah:StaticResource MahApps.Styles.ComboBox}"
+                                            TargetType="{x:Type ComboBox}">
+
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type ComboBox}">
+
+                                                            <Grid>
+
+                                                                <Border Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                                <Grid Margin="{TemplateBinding BorderThickness}">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Name="TextColumn" Width="*" />
+                                                                        <ColumnDefinition Name="ButtonColumn" Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:TextBoxHelper.ButtonWidth), Mode=OneWay}" />
+                                                                        <ColumnDefinition Name="ToggleButtonColumn" Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:TextBoxHelper.ButtonWidth), Mode=OneWay}" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto" />
+                                                                        <RowDefinition Name="ButtonRow" Height="*" />
+                                                                    </Grid.RowDefinitions>
+                                                                    <ToggleButton Name="PART_DropDownToggle" Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="0" VerticalAlignment="Stretch"  Background="Transparent" BorderThickness="0" Foreground="{TemplateBinding Foreground}" IsTabStop="False" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Style="{DynamicResource MahApps.Styles.ToggleButton.ComboBoxDropDown}" IsChecked="{Binding IsDropDownOpen , Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                                                    <Grid Name="ContentSite" Grid.Row="1" Grid.Column="0" Margin="1 0">
+                                                                        <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding SelectionBoxItem}" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" IsHitTestVisible="False" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                                    </Grid>
+                                                                    <TextBox Name="PART_EditableTextBox" Grid.Row="1" Grid.Column="0" Margin="0" Padding="{TemplateBinding Padding}" HorizontalAlignment="Stretch" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"   BorderThickness="0" Focusable="True" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" Foreground="{TemplateBinding Foreground}" IsReadOnly="{TemplateBinding IsReadOnly}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Style="{StaticResource MahApps.Styles.TextBox.ComboBox.Editable}" Visibility="Collapsed" Background="{x:Null}" CharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ComboBoxHelper.CharacterCasing), Mode=OneWay}" MaxLength="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ComboBoxHelper.MaxLength), Mode=OneWay}" />
+                                                                    <TextBlock Name="PART_Message" Grid.Row="1" Grid.Column="0" Margin="4 0" Padding="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Foreground="{TemplateBinding Foreground}" Style="{DynamicResource MahApps.Styles.TextBlock.Watermark}"  Visibility="Collapsed" />
+                                                                    <ContentControl Name="PART_FloatingMessageContainer" Grid.Row="0" Grid.Column="0" Margin="4 0" Style="{DynamicResource MahApps.Styles.ContentControl.FloatingMessageContainer}">
+                                                                        <ContentControl.Height>
+                                                                            <MultiBinding Converter="{converters:MathMultiplyConverter}">
+                                                                                <Binding ElementName="PART_FloatingMessage" Mode="OneWay" Path="ActualHeight" />
+                                                                                <Binding ElementName="PART_FloatingMessageContainer" Mode="OneWay" Path="Opacity" />
+                                                                            </MultiBinding>
+                                                                        </ContentControl.Height>
+                                                                        <TextBlock Name="PART_FloatingMessage" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Foreground="{TemplateBinding Foreground}" Style="{DynamicResource MahApps.Styles.TextBlock.AutoCollapsing}">
+                                                                            <TextBlock.RenderTransform>
+                                                                                <TranslateTransform x:Name="FloatingMessageTransform">
+                                                                                    <TranslateTransform.Y>
+                                                                                        <MultiBinding Converter="{converters:MathSubtractConverter}">
+                                                                                            <Binding ElementName="PART_FloatingMessage" Mode="OneWay" Path="ActualHeight" />
+                                                                                            <Binding ElementName="PART_FloatingMessageContainer" Mode="OneWay" Path="ActualHeight" />
+                                                                                        </MultiBinding>
+                                                                                    </TranslateTransform.Y>
+                                                                                </TranslateTransform>
+                                                                            </TextBlock.RenderTransform>
+                                                                        </TextBlock>
+                                                                    </ContentControl>
+                                                                </Grid>
+                                                                <Border Name="DisabledVisualElement" Grid.ColumnSpan="3" Background="{DynamicResource MahApps.Brushes.Control.Disabled}" BorderBrush="{DynamicResource MahApps.Brushes.Control.Disabled}" BorderThickness="{TemplateBinding BorderThickness}" IsHitTestVisible="False" Opacity="0.6" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Visibility="Collapsed" />
+                                                                <Popup Name="PART_Popup" AllowsTransparency="True" Focusable="False" Placement="Bottom" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" IsOpen="{Binding IsDropDownOpen , RelativeSource={RelativeSource TemplatedParent}}">
+                                                                    <Grid MinWidth="{Binding ActualWidth , RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="{Binding MaxDropDownHeight , RelativeSource={RelativeSource TemplatedParent}}">
+                                                                        <Border Name="PopupBorder" Height="Auto" HorizontalAlignment="Stretch" Background="{DynamicResource MahApps.Brushes.ThemeBackground}" BorderBrush="{DynamicResource MahApps.Brushes.ComboBox.PopupBorder}" BorderThickness="{DynamicResource ComboBoxPopupBorderThemeThickness}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                                                            <ScrollViewer Padding="{DynamicResource ComboBoxPopupBorderThemePadding}" BorderThickness="0">
+
+                                                                                <Grid>
+                                                                                    <Grid.ColumnDefinitions>
+                                                                                        <ColumnDefinition Width="*"/>
+                                                                                    </Grid.ColumnDefinitions>
+                                                                                    <Grid.RowDefinitions>
+                                                                                        <RowDefinition/>
+                                                                                        <RowDefinition/>
+                                                                                        <RowDefinition/>
+                                                                                    </Grid.RowDefinitions>
+                                                                                    <ContentControl>
+
+                                                                                    </ContentControl>
+                                                                                    <ComboBox  
+                                                                                    Grid.Row="1"
+                                                                                    ItemsSource="{Binding DataVolumeTemp}"
+                                                                                    >
+
+
+                                                                                        <ComboBox.ItemTemplate>
+
+                                                                                            <DataTemplate>
+
+                                                                                                <Grid 
+                                                                                                Background="Transparent"
+                                                                                                >
+                                                                                                    <Grid.RowDefinitions>
+                                                                                                        <RowDefinition/>
+                                                                                                    </Grid.RowDefinitions>
+
+                                                                                                    <Grid.ColumnDefinitions>
+
+                                                                                                        <ColumnDefinition 
+                                                                                                        Width="auto" 
+                                                                                                    />
+
+                                                                                                        <ColumnDefinition 
+                                                                                                        Width="auto"
+                                                                                                    />
+
+                                                                                                        <ColumnDefinition 
+                                                                                                        Width="auto"
+                                                                                                    />
+
+                                                                                                        <ColumnDefinition 
+                                                                                                        Width="auto"
+                                                                                                    />
+
+                                                                                                        <ColumnDefinition 
+                                                                                                        Width="auto"
+                                                                                                    />
+
+                                                                                                    </Grid.ColumnDefinitions>
+
+                                                                                                    <TextBlock 
+                                                                                                    Grid.Column="0" 
+                                                                                                    Margin="5"
+                                                                                                    Text="{Binding Volume}"
+                                                                                                />
+
+                                                                                                    <TextBlock 
+                                                                                                    Grid.Column="1" 
+                                                                                                    Margin="5" 
+                                                                                                    Text="/"
+                                                                                                />
+
+                                                                                                    <TextBlock 
+                                                                                                    Grid.Column="2" 
+                                                                                                    Margin="5" 
+                                                                                                    Text="{Binding QuantityPrice}"
+                                                                                                />
+
+                                                                                                    <TextBlock 
+                                                                                                    Grid.Column="3" 
+                                                                                                    Margin="5" 
+                                                                                                    Text="="
+                                                                                                />
+
+                                                                                                    <TextBlock 
+                                                                                                    Margin="5" 
+                                                                                                    Grid.Column="4" 
+                                                                                                    Text="{Binding Result}"
+                                                                                                />
+
+                                                                                                </Grid>
+
+                                                                                            </DataTemplate>
+
+                                                                                        </ComboBox.ItemTemplate>
+
+                                                                                        <ComboBox.Style>
+                                                                                            <Style 
+                                                                                            BasedOn="{mah:StaticResource MahApps.Styles.ComboBox}" 
+                                                                                            TargetType="ComboBox">
+                                                                                                <Style.Setters>
+                                                                                                    <Setter Property="Template" >
+                                                                                                        <Setter.Value>
+                                                                                                            <ControlTemplate>
+                                                                                                                <Grid>
+
+                                                                                                                    <Grid.RowDefinitions>
+                                                                                                                        <RowDefinition/>
+                                                                                                                        <RowDefinition/>
+                                                                                                                        <RowDefinition/>
+                                                                                                                        <RowDefinition/>
+                                                                                                                        <RowDefinition/>
+                                                                                                                    </Grid.RowDefinitions>
+
+                                                                                                                    <Border
+                                                                                                                    Opacity="0.25"
+                                                                                                                    BorderBrush="GreenYellow" 
+                                                                                                                    BorderThickness="3"
+                                                                                                                    Grid.RowSpan="3"
+                                                                                                                    
+                                                                                                                />
+
+                                                                                                                    <ContentControl
+                                                                                                                    Margin="12 10 0 0"
+                                                                                                                    HorizontalAlignment="Left"
+                                                                                                                    FontSize="15"
+                                                                                                                    Grid.Row="0">
+                                                                                                                        <Run>Справочно</Run>
+                                                                                                                    </ContentControl>
+                                                                                                                    <ItemsPresenter  
+                                                                                                                    HorizontalAlignment="Stretch" 
+                                                                                                                    Margin="5" Grid.Row="1"/>
+
+                                                                                                                    <Separator Grid.Row="2"/>
+
+
+                                                                                                                    <!--<Border
+                                                                                                                    Opacity="1"
+                                                                                                                    
+                                                                                                                    BorderThickness="3"
+                                                                                                                    Grid.Row="4"
+                                                                                                                    Grid.RowSpan="2"
+                                                                                                                    
+                                                                                                                >
+                                                                                                                    <Border.BorderBrush>
+                                                                                                                        <SolidColorBrush>
+                                                                                                                            <SolidColorBrush.Color>
+                                                                                                                                <Color A="255" R="215" G="186" B="125"/>
+                                                                                                                            </SolidColorBrush.Color>
+                                                                                                                        </SolidColorBrush>
+                                                                                                                    </Border.BorderBrush>
+                                                                                                                    
+                                                                                                                    <Grid>
+                                                                                                                        <Grid.RowDefinitions>
+                                                                                                                            <RowDefinition/>
+                                                                                                                            <RowDefinition/>
+                                                                                                                        </Grid.RowDefinitions> 
+                                                                                                                        
+                                                                                                                       <ContentControl
+                                                                                                                           Margin="12 10 0 0"
+                                                                                                                           HorizontalAlignment="Left"
+                                                                                                                           FontSize="15"
+                                                                                                                           Grid.Row="0">
+                                                                                                                           <Run>Шаблон</Run>
+                                                                                                                       </ContentControl>
+                                                                                                                        
+                                                                                                                        <StackPanel Grid.Row="1" >
+
+                                                                                                                            <ComboBoxItem >
+                                                                                                                                
+                                                                                                                                  <Grid 
+                                                                                                                                      
+                                                                                                                                    Background="Transparent"
+                                                                                                                                    >
+                                                                                                                                    <Grid.RowDefinitions>
+                                                                                                                                        <RowDefinition/>
+                                                                                                                                    </Grid.RowDefinitions>
+
+                                                                                                                                    <Grid.ColumnDefinitions>
+
+                                                                                                                                        <ColumnDefinition 
+                                                                                                                                            Width="auto" 
+                                                                                                                                        />
+
+                                                                                                                                        <ColumnDefinition 
+                                                                                                                                            Width="auto"
+                                                                                                                                        />
+
+                                                                                                                                        <ColumnDefinition 
+                                                                                                                                            Width="auto"
+                                                                                                                                        />
+
+                                                                                                                                    </Grid.ColumnDefinitions>
+
+                                                                                                                                    <TextBlock 
+                                                                                                                                        Grid.Column="0" 
+                                                                                                                                        Margin="5"
+                                                                                                                                        Text="{Binding ElementName=NumericUpDownWork1,Path=Value}"
+                                                                                                                                    />
+
+                                                                                                                                    <TextBlock 
+                                                                                                                                        Grid.Column="1" 
+                                                                                                                                        Margin="5" 
+                                                                                                                                        Text="/"
+                                                                                                                                    />
+
+                                                                                                                                    <TextBlock 
+                                                                                                                                        Margin="5" 
+                                                                                                                                        Grid.Column="2" 
+                                                                                                                                        Text="{Binding QuantityPirece}"
+                                                                                                                                    />
+
+                                                                                                                                  </Grid>
+
+                                                                                                                            </ComboBoxItem>
+                                                                                                                            <ComboBoxItem>
+                                                                                                                                t2
+                                                                                                                            </ComboBoxItem>
+                                                                                                                            <ComboBoxItem>
+                                                                                                                                t3
+                                                                                                                            </ComboBoxItem>
+                                                                                                                            <ComboBoxItem>
+                                                                                                                                t4
+                                                                                                                            </ComboBoxItem>
+                                                                                                                            <ComboBoxItem>
+                                                                                                                                t5
+                                                                                                                            </ComboBoxItem>
+                                                                                                                        </StackPanel>
+
+                                                                                                                    </Grid>
+                                                                                                                </Border>-->
+                                                                                                                </Grid>
+                                                                                                            </ControlTemplate>
+                                                                                                        </Setter.Value>
+                                                                                                    </Setter>
+                                                                                                </Style.Setters>
+                                                                                            </Style>
+                                                                                        </ComboBox.Style>
+                                                                                    </ComboBox>
+
+
+                                                                                    <ComboBox ItemsSource="{Binding DataObjects}">
+
+                                                                                    </ComboBox>
+
+
+                                                                                </Grid>
+                                                                            </ScrollViewer>
+                                                                        </Border>
+                                                                    </Grid>
+                                                                </Popup>
+                                                            </Grid>
+                                                        </ControlTemplate>
+
+                                                    </Setter.Value>
+
+                                                </Setter>
+
+                                                <Setter Property="IsDropDownOpen" Value="False"/>
+
+
+                                            </Style>
+                                        </ComboBox.Style>
+
+
+                                        <!--<ComboBox.ItemTemplate>
 
                                         <DataTemplate>
 
@@ -2453,46 +2805,63 @@
                                                 <TextBlock 
                                                     Grid.Column="1" 
                                                     Margin="5" 
-                                                    Text="x"
+                                                    Text="/"
                                                 />
 
                                                 <TextBlock 
                                                     Margin="5" 
                                                     Grid.Column="2" 
-                                                    Text="{Binding Result,StringFormat=C2}"
+                                                    Text="{Binding Result}"
                                                 />
 
                                             </Grid>
 
+                                            
                                         </DataTemplate>
 
-                                    </ComboBox.ItemTemplate>
 
-                                </ComboBox>
+                                        
+                                        
+                                    </ComboBox.ItemTemplate>-->
 
-                            </DataTemplate>
 
-                        </DataGridTemplateColumn.CellTemplate>
 
-                    </DataGridTemplateColumn>
+                                    </ComboBox>
 
-                </DataGrid.Columns>
 
-                <DataGrid.RowHeaderTemplate>
 
-                    <ItemContainerTemplate>
+                                </DataTemplate>
 
-                        <Grid>
 
-                            <Grid.RowDefinitions>
 
-                                <RowDefinition 
+                            </DataGridTemplateColumn.CellTemplate>
+
+
+
+                        </DataGridTemplateColumn>
+
+
+
+                    </DataGrid.Columns>
+
+
+
+
+                    <DataGrid.RowHeaderTemplate>
+
+                        <ItemContainerTemplate>
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+
+                                    <RowDefinition 
                                     Height="*"
                                 />
 
-                            </Grid.RowDefinitions>
+                                </Grid.RowDefinitions>
 
-                            <Button 
+                                <Button 
                                 Width="30"
                                 Height="40"
                                 Grid.Row="0" 
@@ -2501,16 +2870,17 @@
                                 Content="⬇"
                             />
 
-                        </Grid>
+                            </Grid>
 
-                    </ItemContainerTemplate>
+                        </ItemContainerTemplate>
 
-                </DataGrid.RowHeaderTemplate>
+                    </DataGrid.RowHeaderTemplate>
 
-            </DataGrid>
+                </DataGrid>
 
-        </ScrollViewer>
+            </ScrollViewer>
 
+        </Grid>
     </Grid>
 
 </mah:MetroWindow>

@@ -9,32 +9,61 @@ namespace AppPars
 {
     internal class ReqestLogic
     {
-        private readonly Uri _webReqest;
-        public ReqestLogic(string webReqest = @"https://www.binance.com/fapi/v1/ticker/price") => _webReqest = new Uri(webReqest);
-        
+        private readonly Uri _webReqest = new Uri(@"https://www.binance.com/fapi/v1/ticker/price");
+        private readonly Uri _webReqest2 = new Uri(@"https://www.binance.com/fapi/v1/exchangeInfo");
+        public ReqestLogic()
+        {
+
+        }
+
 
         public async Task<CurrencyObject[]> GetObjectData()
         {
-            using HttpClient httpClient = new HttpClient();
-            List<CurrencyObject> data = new List<CurrencyObject>();
+            (string Symbol, decimal StepSize)[]? StepSize = null;
+            CurrencyObjectBase[]? currencyObject = null; 
+         
+            Task task1 = Task.Run(async () =>
+            {
+                JsonSerializerOptions optionJson = new JsonSerializerOptions();
+                optionJson.Converters.Add(new StepSizeJsonConverter());
+                using HttpClient httpClient = new HttpClient();
+                StepSize = await httpClient.GetFromJsonAsync<(string Symbol, decimal StepSize)[]>(requestUri: _webReqest2, options: optionJson) ?? throw new InvalidOperationException();
+            });
+            Task task2 = Task.Run(async () =>
+            {
+                JsonSerializerOptions optionJson = new JsonSerializerOptions();
+                optionJson.Converters.Add(new CurrencyObjectJsonConverter());
+                using HttpClient httpClient = new HttpClient();
+                currencyObject = await httpClient.GetFromJsonAsync<CurrencyObjectBase[]>(requestUri: _webReqest, options: optionJson) ?? throw new InvalidOperationException();
+            });
 
-            JsonSerializerOptions optionJson = new JsonSerializerOptions();
-            optionJson.Converters.Add(new CurrencyObjectJsonConverter());
+            await Task.WhenAll(task1,task2);
 
-            return await httpClient.GetFromJsonAsync<CurrencyObject[]>(requestUri: _webReqest, options: optionJson) ?? throw new InvalidOperationException();
+
+            IEnumerable<CurrencyObject> joinResult = DataUnion(currencyObject ?? throw new InvalidOperationException(), StepSize ?? throw new InvalidOperationException());
+
+            return joinResult?.ToArray() ?? throw new NullReferenceException();
         }
-        public class CurrencyObjectJsonConverter : JsonConverter<CurrencyObject>
+
+
+        private static IEnumerable<CurrencyObject> DataUnion(IEnumerable<CurrencyObjectBase> list1, IEnumerable<(string Symbol, decimal Step)> list2)
+        {         
+            var joinAnonim = list1.Join(list2, x => x.Symbol, y => y.Symbol,(cur, y) => new { cur, y.Step });
+            return joinAnonim.Select(x => new CurrencyObject(x.Step,x.cur.Symbol,x.cur.Price,x.cur.Time));
+        }
+
+        public class CurrencyObjectJsonConverter : JsonConverter<CurrencyObjectBase>
         {
-            public override CurrencyObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            public override CurrencyObjectBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
                 if (reader.TokenType == JsonTokenType.Null) return null;
 
-                Type currencyObjectType = typeof(CurrencyObject);
+                Type currencyObjectType = typeof(CurrencyObjectBase);
 
-                var res22 = currencyObjectType.GetConstructors();
+                var constuctors = currencyObjectType.GetConstructors();
                 ConstructorInfo? constructorInfo = null;
 
-                foreach (ConstructorInfo item in res22)
+                foreach (ConstructorInfo item in constuctors)
                 {
                     if (item.GetCustomAttribute(typeof(JsonConstructorAttribute)) is not JsonConstructorAttribute) continue;
                     else
@@ -49,7 +78,7 @@ namespace AppPars
 
                 JsonElement jsonElement = JsonDocument.ParseValue(ref reader).RootElement;
                 if (jsonElement.ValueKind != JsonValueKind.Object) throw new InvalidOperationException();
-               
+
                 string? itemSymbol = null;
                 decimal? itemPrice = null;
                 long? itemTime = null;
@@ -79,12 +108,38 @@ namespace AppPars
                         else { throw new InvalidOperationException("Unknown constructor signature"); }
                     }
                 }
-                return new CurrencyObject(itemSymbol ?? throw new NullReferenceException(), itemPrice ?? throw new NullReferenceException(), itemTime ?? throw new NullReferenceException());
+                return new CurrencyObjectBase(itemSymbol ?? throw new NullReferenceException(), itemPrice ?? throw new NullReferenceException(), itemTime ?? throw new NullReferenceException());
             }
 
-            public override void Write(Utf8JsonWriter writer, CurrencyObject value, JsonSerializerOptions options) => throw new NotImplementedException();
+            public override void Write(Utf8JsonWriter writer, CurrencyObjectBase value, JsonSerializerOptions options) => throw new NotImplementedException();
 
         }
+
+        public class StepSizeJsonConverter : JsonConverter<(string Symbol, decimal StepSize)[]>
+        {
+            public override (string Symbol, decimal StepSize)[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                using  JsonDocument jsonDoc = JsonDocument.ParseValue(ref reader);
+                (string symbol, decimal stepSize)[] tuple = jsonDoc.RootElement.GetProperty("symbols").EnumerateArray().Select(x =>
+                {
+                    string symbol = x.GetProperty("symbol").GetString() ?? throw new NullReferenceException();
+                    string stepSizeStr = x.GetProperty("filters").EnumerateArray().Single(s => s.GetProperty("filterType").GetString() == "LOT_SIZE").GetProperty("stepSize").GetString() ?? throw new NullReferenceException();
+
+                    decimal stepSize = Convert.ToDecimal(stepSizeStr, CultureInfo.InvariantCulture);
+
+                    return (symbol, stepSize);
+
+                }).ToArray();
+
+                return tuple;
+            }
+
+            public override void Write(Utf8JsonWriter writer, (string Symbol, decimal StepSize)[] value, JsonSerializerOptions options)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
 
     }
 }
