@@ -129,36 +129,7 @@ namespace AppPars
                
             };
 
-            //commandOverwrite.Changed.Subscribe(x =>
-            //{
-            //    x.IsExecuting.Subscribe(x =>
-            //    {
-            //        if (x is true) ((ContentControl)this.ButtonOverwriteAllFiles.Content).Content = new Run("Обработка");
-            //        else ((ContentControl)this.ButtonOverwriteAllFiles.Content).Content = new Run("Выгрузить");
-            //    });
-
-            //});
-
-
-            //IReactiveBinding<MainWindow, ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>> commandNewDirectory = this.BindCommand(this.ViewModel,
-            //vm => vm.SetNewDirectoryCommand,
-            //v => v.ButtonNewDirectory);
-
-
-            //IReactiveBinding<MainWindow, ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>> commandOpenDirectory = this.BindCommand(this.ViewModel,
-            //vm => vm.OpenDirectoryCommand,
-            //v => v.ButtonOpenDirectory);
-
-
-
-
-            //var commandSetNewTemaplateCommandAll = this.BindCommand(this.ViewModel,
-            //vm => vm.SetNewTemaplateCommand,
-            //v => v.ButtonTemplateALL,
-            //withParameter:
-
-            //this.WhenAnyValue(x => x.NumericUpDownWork1.Value, x => x.NumericUpDownWork2.Value, x => x.NumericUpDownWork3.Value, x => x.NumericUpDownWork4.Value, x => x.NumericUpDownWork5.Value));
-
+         
 
         }
 
