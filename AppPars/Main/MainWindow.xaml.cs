@@ -60,8 +60,6 @@ namespace AppPars
             set => SetValue(ViewModelProperty, value);
         }
 
-        [DllImport("dwmapi.dll", PreserveSig = false)]
-        private static extern void DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurbehind blurBehind);
 
         public MainWindow(MainWindowViewModel viewModel)
         {
@@ -228,6 +226,8 @@ namespace AppPars
 
 
 
+        [DllImport("dwmapi.dll", PreserveSig = false)]
+        private static extern void DwmEnableBlurBehindWindow(IntPtr hwnd, ref DwmBlurbehind blurBehind);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct DwmBlurbehind

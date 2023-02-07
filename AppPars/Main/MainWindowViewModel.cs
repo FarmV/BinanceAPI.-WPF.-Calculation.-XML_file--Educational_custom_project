@@ -33,8 +33,7 @@ namespace AppPars
         private DataManagement _dataManagement;
         private IEnumerable<DataObject> _dataObjects;
         public bool _saveProccesinng = false;
-        private double[] _valueTemaplete = new double[] { 0, 0, 0, 0, 0 };
-        //public OverwriteAllFilesCommand _commandOverwriteAllFilesCommand;     
+        private double[] _valueTemaplete = new double[] { 0, 0, 0, 0, 0 };  
         public ReactiveCommand<Unit, Unit> OverwriteAllFilesCommand { get; private set; }
         public ReactiveCommand<Unit, Unit> SetNewDirectoryCommand { get; private set; }
         public ReactiveCommand<Unit, Unit> OpenDirectoryCommand { get; private set; }
@@ -81,25 +80,7 @@ namespace AppPars
 
         public MainWindowViewModel(Task<DataManagement> dataManagement)
         {
-            CreateData = dataManagement;
-            //_dataManagement = dataManagement;
-            //DataObjects = _dataManagement.CalculateMultiplier();
-
-            //_firstData = DataObjects.First();
-
-            
-
-            //OverwriteAllFilesCommand = ReactiveCommand.CreateFromTask(cen => DataManagement.OverwriteAllFiles(DataObjects, cen));
-            //SetNewDirectoryCommand = ReactiveCommand.Create(DataManagement.SetNewDirectory);
-            //OpenDirectoryCommand = ReactiveCommand.CreateFromTask(() =>
-            //{
-            //    string argument = "/n, \"" + $"{ _dataManagement.SavePath}" + "\""  ;
-            //    System.Diagnostics.Process.Start("explorer.exe", argument);
-            //    return Task.CompletedTask;
-            //});
-
-            //SetNewTemaplateCommand =  ReactiveCommand.Create(((double?, double?, double?, double?, double?) o ) => SetNewTemaplate(Convert.ToDecimal(o.Item1 ?? 0), Convert.ToDecimal(o.Item2 ?? 0), Convert.ToDecimal(o.Item3 ?? 0 ), Convert.ToDecimal(o.Item4 ?? 0 ), Convert.ToDecimal(o.Item5 ?? 0)));
-            //GetDataHTTPCommand = ReactiveCommand.CreateFromTask(GetDataHTTP);
+            CreateData = dataManagement;            
         }
 
         public async Task GetDataHTTP()
