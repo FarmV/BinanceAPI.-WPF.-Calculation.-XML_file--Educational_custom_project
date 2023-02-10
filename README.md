@@ -23,3 +23,7 @@
 | JsonConverter and JSON DOM | Преобразование Json ответа, с усечением, в объект | [ReqestLogic](https://github.com/FarmV/BinanceAPI.-WPF.-Calculation.-XML_file--Educational_custom_project/blob/f0f71ce79db53341b153ddc6320025d41995fd24/AppPars/ReqestLogic.cs#L20-L135) |
 | LINQ XML DOM | Преобразование исходного XML файла по шаблону | [DataManagement](https://github.com/FarmV/BinanceAPI.-WPF.-Calculation.-XML_file--Educational_custom_project/blob/f0f71ce79db53341b153ddc6320025d41995fd24/AppPars/DataManagement.cs#L214-L231) |
 |DwmEnableBlurBehindWindow| Установка прозрачности для окна (несмотря на название и документацию?) | [MainWindow1](https://github.com/FarmV/BinanceAPI.-WPF.-Calculation.-XML_file--Educational_custom_project/blob/master/AppPars/Main/MainWindow.xaml.cs#L200-L220) [MainWindow2](https://github.com/FarmV/BinanceAPI.-WPF.-Calculation.-XML_file--Educational_custom_project/blob/master/AppPars/Main/MainWindow.xaml.cs#L148-L162)
+
+---
+>__Note__ Проект предпологает в рефакторинг.
+
