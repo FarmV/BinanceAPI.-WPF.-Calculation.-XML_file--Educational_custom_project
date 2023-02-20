@@ -92,11 +92,6 @@ namespace AppPars
             }
             return retuenList;
         }
-
-
-
-
-
     }
     internal class SaveXML
     {
