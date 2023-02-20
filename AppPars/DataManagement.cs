@@ -191,7 +191,6 @@ namespace AppPars
         {
             if (File.Exists(path) is not true)
             {
-
                 if (Directory.Exists(Path.GetDirectoryName(path)) is not true)
                 {
                     System.Windows.MessageBox.Show($"Вероятно отсутствует директория{Environment.NewLine}{Path.GetDirectoryName(path)}{Environment.NewLine}Проверте наличие директории{Environment.NewLine}Программа будет закрыта","Ошибка",

@@ -19,7 +19,7 @@ namespace AppPars
     internal class Program
     {
         internal static string RelativePathSaveData = $"{Path.GetDirectoryName(Environment.ProcessPath)}\\results\\";
-        internal static bool StartAppDesigner = true ;
+        internal static bool StartAppDesigner = true;
 
         [STAThread]
         static void Main(string[] args)
@@ -29,41 +29,35 @@ namespace AppPars
             app.Run();
         }
 
-        private static async Task AppStartupAsync(string[] args) 
+        private static async Task AppStartupAsync(string[] args)
         {
-            StartAppDesigner = false ;
-          // DataManagement dataManagement = await DataManagement.Create().ConfigureAwait(false);
-            await OP.CreateMainWindow(new MainWindowViewModel(DataManagement.Create())).ConfigureAwait(false);
-
+            StartAppDesigner = false;
             using IHost host = Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((hostingContext, configuration) =>
-            { configuration.Sources.Clear(); }).ConfigureServices((hostContext, container) =>
+            { configuration.Sources.Clear(); }).ConfigureServices((_, container) =>
             {
-                //container.AddSingleton<System.Windows.Application>(Services.CreateMainWindow(new MainWindowViewModel(dataManagement)));
-                // container.BuildServiceProvider();
+                container.AddSingleton(Services.CreateMainWindow(Services.CreateMainWindowViewModel()));
             }).Build();
             CancellationTokenSource cts = new CancellationTokenSource();
-            IServiceProvider r11 = host.Services;
-            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            IServiceProvider serviceProvider = host.Services;
+            Task<MainWindow> createMainWindow = serviceProvider.GetRequiredService<Task<MainWindow>>();
+            MainWindow mainWindow = await createMainWindow.ConfigureAwait(false);
+            await mainWindow.Dispatcher.InvokeAsync(() =>
             {
-                System.Windows.Application.Current.MainWindow.Closed += (_, _) => cts.Cancel();
-                System.Windows.Application.Current.MainWindow.Show();
-            });
+                mainWindow.Closed += (_, _) => cts.Cancel();
+                mainWindow.Show();
+            });            
             await host.RunAsync(cts.Token);
         }
     }
 
-    internal static partial class OP
+    internal static partial class Services
     {
-        internal static async Task CreateMainWindow(MainWindowViewModel viewModel)
+        internal static async Task<MainWindow> CreateMainWindow(MainWindowViewModel viewModel)
         {
-            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-            {
-                MainWindow mainWindow = new MainWindow(viewModel);
-                //WindowInteropHelper interopHelper = new WindowInteropHelper(mainWindow);
-                //interopHelper.EnsureHandle();
-            }).Task.ConfigureAwait(false);
+            MainWindow? mainWindow = null;
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => { mainWindow = new MainWindow(viewModel); }).Task.ConfigureAwait(false);
+            return mainWindow ?? throw new NullReferenceException();
         }
-
-
+        internal static MainWindowViewModel CreateMainWindowViewModel() => new MainWindowViewModel(DataManagement.Create());                    
     }
 }
