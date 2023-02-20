@@ -11,16 +11,14 @@ using System.Xml.Linq;
 
 namespace AppPars
 {
-    public partial class DataManagement : ReactiveUI.ReactiveObject
+    public partial class DataManagement : ReactiveObject
     {
-        private IEnumerable<decimal> _multiplier;
-        private SaveXML _saveXML;
-        private IEnumerable<CurrencyObject> _currencies;
+        private readonly string _fileMask = "BINAD.CCUR_FUT.{price.symbol}_Settings_55555.xml";
+        private readonly SaveXML _saveXML;
+        private readonly IEnumerable<decimal> _multiplier;
+        private readonly IEnumerable<CurrencyObject> _currencies;
         private static decimal[] _defoltMultiplier = new decimal[] { 100, 250, 500, 1000, 3000 };
-        private string _savePath;
-        private string _fileMask = "BINAD.CCUR_FUT.{price.symbol}_Settings_55555.xml";
-
-         
+        private string _savePath;        
         public string SavePath
         {
             get => _savePath;
@@ -40,10 +38,8 @@ namespace AppPars
             else SavePath = newPath; 
         }
         public async Task OverwriteAllFiles(IEnumerable<DataObject> data, CancellationToken cancellationToken = default)
-        {
-         
-           
-            IEnumerable<Task> tasks = data.Select(data => _saveXML.SaveDataFile(Path.Combine(SavePath, _fileMask.Replace("{price.symbol}", data.CurrencyObject.Symbol)),data, cancellationToken));
+        {                   
+            IEnumerable<Task> tasks = data.Select(data => _saveXML.SaveDataFile(Path.Combine(SavePath, _fileMask.Replace("{price.symbol}", data.CurrencyObject.Symbol)), data, cancellationToken));
             await Task.WhenAll(tasks);
         }
         private string? SaveFileDirectory(string Title)
@@ -56,12 +52,10 @@ namespace AppPars
                 ShowNewFolderButton = true,
                 ShowPinnedPlaces =true,
                 UseDescriptionForTitle = true,
-
             };
             if (DirectoryDialog.ShowDialog() is not DialogResult.OK) return null;
             return DirectoryDialog.SelectedPath;
         }
-
         private DataManagement(IEnumerable<CurrencyObject> currencies, IEnumerable<decimal> multiplier)
         {
             _savePath = $"{Directory.GetParent(Environment.ProcessPath ?? throw new NullReferenceException())}\\output\\";
@@ -78,12 +72,7 @@ namespace AppPars
             return new DataManagement(currencies, multiplierSet);
         }
         internal decimal CalculateVolume(decimal volume,decimal price) => volume / price;
-
-        internal decimal CalculateAdjustTheStep(decimal volume, decimal stepSize)
-        {
-            return Math.Floor(volume / stepSize) * stepSize;
-        }
-
+        internal decimal CalculateAdjustTheStep(decimal volume, decimal stepSize) => Math.Floor(volume / stepSize) * stepSize;       
         public IEnumerable<DataObject> CalculateMultiplier()
         {
             Dictionary<CurrencyObject, List<DataVolumeTmp>> tempDictionary = new();
