@@ -98,9 +98,6 @@ namespace AppPars
 
 
     }
-
-
-
     internal class SaveXML
     {
         public static string _defaultXML = """
@@ -175,7 +172,6 @@ namespace AppPars
               </TRADING>
             </Settings>
             """;
-
         public async Task SaveDataFile(string path, DataObject data, CancellationToken cancellationToken = default)
         {
             if (File.Exists(path) is not true)
@@ -198,7 +194,6 @@ namespace AppPars
                 return;
             }
         }
-
         private class Utf8StringWriter : StringWriter { public override Encoding Encoding { get => Encoding.UTF8; } }
         private string ConvertDataToXML(string soureceXML, DataObject data)
         {
@@ -217,7 +212,6 @@ namespace AppPars
             doc.Save(writer, SaveOptions.None);
             return writer.ToString();
         }
-
         private async Task OverwriteTextFile(string path, string data, CancellationToken cancellationToken = default) => await File.WriteAllTextAsync(path, data, Encoding.UTF8, cancellationToken);
     }
 }
