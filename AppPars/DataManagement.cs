@@ -192,18 +192,18 @@ namespace AppPars
         private class Utf8StringWriter : StringWriter { public override Encoding Encoding { get => Encoding.UTF8; } }
         private string ConvertDataToXML(string soureceXML, DataObject data)
         {
-            static string NameOf<T>(Expression<Func<T>> expr) => ((MemberExpression)expr.Body).Member.Name;
+            //static string NameOf<T>(Expression<Func<T>> expr) => ((MemberExpression)expr.Body).Member.Name;
 
             string valueAttribut = "Value";
             XDocument doc = XDocument.Parse(soureceXML, LoadOptions.PreserveWhitespace);
             doc.Declaration = new XDeclaration("1.0", "utf-8", null);
             using StringWriter writer = new Utf8StringWriter();
             XElement nodeTRADING = doc.Element(XName.Get("Settings"))!.Element("TRADING") ?? throw new NullReferenceException();
-            nodeTRADING!.Element(NameOf(() => data.First_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.First_WorkAmount.ToString(CultureInfo.InvariantCulture);
-            nodeTRADING!.Element(NameOf(() => data.Second_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Second_WorkAmount.ToString(CultureInfo.InvariantCulture);
-            nodeTRADING!.Element(NameOf(() => data.Third_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Third_WorkAmount.ToString(CultureInfo.InvariantCulture);
-            nodeTRADING!.Element(NameOf(() => data.Fourth_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Fourth_WorkAmount.ToString(CultureInfo.InvariantCulture);
-            nodeTRADING!.Element(NameOf(() => data.Fifth_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Fifth_WorkAmount.ToString(CultureInfo.InvariantCulture);
+            nodeTRADING!.Element(nameof(DataObject.First_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.First_WorkAmount.ToString(CultureInfo.InvariantCulture);
+            nodeTRADING!.Element(nameof(DataObject.Second_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Second_WorkAmount.ToString(CultureInfo.InvariantCulture);
+            nodeTRADING!.Element(nameof(DataObject.Third_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Third_WorkAmount.ToString(CultureInfo.InvariantCulture);
+            nodeTRADING!.Element(nameof(DataObject.Fourth_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Fourth_WorkAmount.ToString(CultureInfo.InvariantCulture);
+            nodeTRADING!.Element(nameof(DataObject.Fifth_WorkAmount))!.Attribute(XName.Get(valueAttribut))!.Value = data.Fifth_WorkAmount.ToString(CultureInfo.InvariantCulture);
             doc.Save(writer, SaveOptions.None);
             return writer.ToString();
         }
